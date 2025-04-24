@@ -9,7 +9,7 @@ This is a full-stack web application that allows users to reserve tables at our 
 
 ## Quick Setup
 
-### 1. Clone this repository: `git clone https://github.com/.git`
+### 1. Clone this repository: `git clone https://github.com/andrejwastaken/Restaurant-App.git`
 
 ### 2. Set up environment variables
 
@@ -42,16 +42,5 @@ DB_HOST=x
 
 ### 4. Populate the database
 
-Once everything is set up, you can populate the database with existing data, by running
+Once everything is set up, you can populate the database with existing data.
 
-`python3 -m tools.scripts.fill_db`
-
-> For windows users, use python or py instead of python3
-
-## Notes
-
-All of the data used in this project is public data from the faculty, collected by various scrapers.
-
-## License
-
-This project is licensed under the MIT license.
