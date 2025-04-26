@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'backend',
     'reservations',
     'restaurants',
-    'users'
+    'users',
+    'clients',
+    
 ]
 
 MIDDLEWARE = [
