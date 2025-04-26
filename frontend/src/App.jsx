@@ -1,10 +1,14 @@
 import "./index.css";
-  
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import RestaurantList from "./components/RestaurantList";
+
 function App() {
   return (
-    <>
-      <h1 class="text-3xl font-bold underline">Hello world!</h1>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/restaurants" element={<RestaurantList/>} />
+      </Routes>
+    </Router>
   );
 }
 
