@@ -9,7 +9,7 @@ class Command(BaseCommand):
         try:
             # This should be done automatically when a new owner is created
             owner_user = User.objects.get(username='aristikj')
-
+            owner_profile = owner_user.ownerprofile
             restaurant_data = [
                 {'name': 'Restaurant A', 'description': 'A nice place to eat. Good for families.'},
                 {'name': 'Restaurant B', 'description': 'A quick place to grab lunch.'},
@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
             for data in restaurant_data:
                 restaurant = Restaurant.objects.create(
-                    owner=owner_user,
+                    owner=owner_profile,
                     name=data['name'],
                     description=data['description']
                 )
