@@ -4,9 +4,17 @@ from .models import User
 # Register your models here.
 class CustomUserAdmin(BaseUserAdmin):
     model = User
-    list_display = ('email', 'username', 'is_staff', 'is_active')
-    list_filter = ('role', 'is_staff', 'is_active')
-    search_fields = ('email', 'username')
+    list_display = (
+        'email',
+        'username',
+        'phone_number',
+        'is_staff',
+        'is_active',
+    )
+    search_fields = (
+        'email',
+        'username',
+        'phone_number',
+    )
     ordering = ('email',)
-
 admin.site.register(User, CustomUserAdmin)

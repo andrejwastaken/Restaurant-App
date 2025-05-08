@@ -13,6 +13,7 @@ const router = createBrowserRouter([
     element: <RestaurantList />,
   },
 ]);
+
 function App() {
   return <RouterProvider router={router} />;
 }

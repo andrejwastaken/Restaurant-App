@@ -4,10 +4,10 @@ from users.models import User
 # Create your models here.
 
 class OwnerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'role': 'OWNER'})
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
 class Restaurant(models.Model):
-    owner = models.ForeignKey(OwnerProfile, on_delete=models.CASCADE, limit_choices_to={'role': 'OWNER'})
+    owner = models.ForeignKey(OwnerProfile, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank = True, null = True)
 
