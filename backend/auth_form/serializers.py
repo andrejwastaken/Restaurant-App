@@ -1,13 +1,18 @@
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
+from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from users.models import User
 from clients.models import ClientProfile
 from restaurants.models import OwnerProfile
 
 User = get_user_model()
 
-class UserRegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only = True)
+    email = serializers.EmailField(required = True)
+    phone_number = serializers.CharField(required = True)
+    username = serializers.CharField(min_length = 4)
 
     class Meta:
         model = User
@@ -16,8 +21,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except ValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+
+        return value
+
     def create(self, validated_data):
-        # Create user
         user = User.objects.create_user(
             email = validated_data['email'],
             username = validated_data['username'],
@@ -25,9 +37,29 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password = validated_data['password']
         )
 
-        # Create Client/Owner
-        ClientProfile.objects.create(user = user)
-        OwnerProfile.objects.create(user = user)
+        ClientProfile.objects.get_or_create(user = user)
+        OwnerProfile.objects.get_or_create(user = user)
 
         return user
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required = True)
+    password = serializers.CharField(required = True, write_only = True)
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        if email and password:
+            user = authenticate(username = email, password = password)
+
+            if user is None:
+                raise AuthenticationFailed(detail = 'Invalid email or password.')
+            if not user.is_active:
+                raise AuthenticationFailed(detail = 'User inactive or deleted.')
+
+            data['user'] = user
+            return data
+        else:
+            serializers.ValidationError(detail = 'Must include email and password.')
 
