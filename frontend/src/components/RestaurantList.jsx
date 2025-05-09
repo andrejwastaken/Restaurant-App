@@ -5,7 +5,11 @@ function RestaurantList() {
   const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/restaurants/")
+    fetch("http://localhost:8000/api/restaurants/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access")}`
+      }
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

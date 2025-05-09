@@ -7,23 +7,18 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// sredi protected routes koi da se
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
   },
   {
-    path: "/app",
-    // element: (
-    //   <ProtectedRoute>
-    //    < />
-    //   </ProtectedRoute>
-    // ),
-  },
-  {
     path: "/restaurants",
-    element: <RestaurantList />,
+    element: (
+      <ProtectedRoute>
+        <RestaurantList />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/login",

@@ -213,7 +213,7 @@ function Navbar() {
                     </a>
                     <button
                       onClick={handleLogout}
-                      className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      className="cursor-pointer flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
                       <svg
                         className="mr-2 h-4 w-4"
@@ -236,7 +236,7 @@ function Navbar() {
             ) : (
               <button
                 onClick={handleLoginClick}
-                className="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 transition-colors"
+                className="cursor-pointer flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 transition-colors"
               >
                 Login
               </button>
