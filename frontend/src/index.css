@@ -1,2 +1,10 @@
 @tailwind utilities;
 
+.nav-link {
+  @apply flex items-center text-gray-600 hover:text-amber-400 px-3 py-2 rounded-md text-sm font-medium;
+}
+
+.dropdown-item {
+  @apply flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left;
+}
+
