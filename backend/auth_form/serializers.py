@@ -2,6 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.exceptions import ValidationError, AuthenticationFailed
+from rest_framework.validators import UniqueValidator
 from users.models import User
 from clients.models import ClientProfile
 from restaurants.models import OwnerProfile
@@ -9,10 +10,20 @@ from restaurants.models import OwnerProfile
 User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only = True)
-    email = serializers.EmailField(required = True)
-    phone_number = serializers.CharField(required = True)
-    username = serializers.CharField(min_length = 4)
+    email = serializers.EmailField(
+        required = True,
+        validators = [UniqueValidator(queryset=User.objects.all(), message = "Email already exists")],
+    )
+    username = serializers.CharField(
+        min_length = 4,
+        validators= [UniqueValidator(queryset=User.objects.all(), message = "Username already exists")],
+    )
+    # Dali povekje users mozat da imaat ist broj??
+    phone_number = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all(), message="Phone number already exists")],
+    )
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User

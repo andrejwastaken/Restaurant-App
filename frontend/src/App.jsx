@@ -1,5 +1,6 @@
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import RestaurantList from "./components/RestaurantList";
 import Home from "./pages/Home";
@@ -31,7 +32,12 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster position="bottom-center" />
+    </>
+  );
 }
 
 export default App;
