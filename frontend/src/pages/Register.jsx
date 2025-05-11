@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import PasswordInput from "../components/PasswordInput";
 import api from "../api/api";
 
 import Loading from "../components/Loading";
@@ -159,16 +160,11 @@ function Register() {
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                required
-                className="w-full box-border rounded-lg border border-gray-300 px-4 py-3 text-gray-900 shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
-              />
+                <PasswordInput
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  />
               <p className="mt-2 text-sm text-red-600 font-medium">
                 {formErrors.password ? formErrors.password : ""}
               </p>
@@ -181,16 +177,11 @@ function Register() {
               >
                 Confirm Password
               </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="••••••••"
-                required
-                className="w-full box-border rounded-lg border border-gray-300 px-4 py-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-              />
+                <PasswordInput
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
               <p className="mt-2 text-sm text-red-600 font-medium">
                 {formErrors.confirmPassword ? formErrors.confirmPassword : ""}
               </p>

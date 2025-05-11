@@ -3,12 +3,17 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from rest_framework.validators import UniqueValidator
+from django.core.validators import RegexValidator
 from users.models import User
 from clients.models import ClientProfile
 from restaurants.models import OwnerProfile
 
 User = get_user_model()
 
+phone_number_regex = RegexValidator(
+    regex=r'^\+389\s\d{2}-\d{3}-\d{3}$',
+    message = "Phone number must be in the format: '+389 XX-XXX-XXX"
+)
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required = True,
@@ -18,10 +23,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         min_length = 4,
         validators= [UniqueValidator(queryset=User.objects.all(), message = "Username already exists")],
     )
-    # Dali povekje users mozat da imaat ist broj??
     phone_number = serializers.CharField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all(), message="Phone number already exists")],
+        validators=[UniqueValidator(queryset=User.objects.all(), message="Phone number already exists"),
+                    phone_number_regex],
     )
     password = serializers.CharField(write_only=True)
 

@@ -38,6 +38,7 @@ function Navbar() {
       setIsLoggedIn(false);
       setDropdownOpen(false);
       setIsOpen(false);
+      navigate("/")
     }
   }
 

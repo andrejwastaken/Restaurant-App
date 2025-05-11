@@ -1,10 +1,14 @@
 function Search() {
   return (
-    <input
-      className="justify-self-center border-none px-6 py-[0.6rem] text-[1rem] rounded-[0.7rem] w-[40rem] transition-all text-white bg-[var(--color-primary-light)] placeholder-[var(--color-text-dark)] focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:-translate-y-[2px]"
-      type="text"
-      placeholder="Search restaurants..."
-    />
+    <div className="w-full">
+      <input
+        type="text" 
+        placeholder="Search..."
+        className="w-full px-4 py-2 text-sm text-amber-600 bg-gray-100 border border-gray-300 rounded-lg 
+                   focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                   dark:bg-white-700 dark:text-amber-600 dark:border-amber-500 dark:placeholder-amber-600"
+      />
+    </div>
   );
 }
 

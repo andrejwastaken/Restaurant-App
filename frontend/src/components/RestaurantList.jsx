@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import "../index.css";
-
-import NavBarTest from "./NavBarTest";
+import Navbar from "./Navbar";
+import SearchBar from "./SearchBar";
+import Footer from "./Footer";
 
 function RestaurantList() {
   const [restaurants, setRestaurants] = useState([]);
@@ -29,17 +30,20 @@ function RestaurantList() {
 
   return (
     <div>
-      <NavBarTest />
-
+      <Navbar/>
+      <SearchBar />
       <h1 className="text-3xl font-bold mb-4 group-hover:">Restaurants: </h1>
-      <ul>
-        {restaurants.map((restaurant) => (
-          <li key={restaurant.id}>
-            <h2>{restaurant.name}</h2>
-            <p>{restaurant.description}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="flex gap-4 h-full justify-center items-center">
+        <ul>
+          {restaurants.map((restaurant) => (
+            <li key={restaurant.id}>
+              <h2>{restaurant.name}</h2>
+              <p>{restaurant.description}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <Footer />
     </div>
   );
 }

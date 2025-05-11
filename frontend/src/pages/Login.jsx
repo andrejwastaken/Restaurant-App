@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import PasswordInput from "../components/PasswordInput";
 import api from "../api/api";
 
 import Loading from "../components/Loading";
@@ -41,8 +42,8 @@ function Login() {
 
       navigate("/");
     } catch (error) {
-      const message = "Something went wrong. Please try again!";
-      toast.error(message);
+      const detail = error.response.data.detail + ".";
+      toast.error(detail);
     } finally {
       setIsLoading(false);
     }
@@ -82,8 +83,6 @@ function Login() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  // ako znaes popravi go paddingot na cudovo za sega mu trgav width-full
-                  // box-border (fixed)
                   className="w-full box-border rounded-lg border border-gray-300 px-4 py-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
                   placeholder="your@email.com"
                 />
@@ -102,18 +101,11 @@ function Login() {
                   Password
                 </label>
               </div>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  type="password"
+                <PasswordInput
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  required
-                  className="w-full box-border rounded-lg border border-gray-300 px-4 py-3 text-gray-900 shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
-                  placeholder="••••••••"
                 />
-              </div>
             </div>
           </div>
 
