@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import '../index.css';
+import "../index.css";
+
+import NavBarTest from "./NavBarTest";
 
 function RestaurantList() {
   const [restaurants, setRestaurants] = useState([]);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:8000/api/restaurants/", {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("access")}`
-      }
+        Authorization: `Bearer ${localStorage.getItem("access")}`,
+      },
     })
       .then((response) => {
         if (!response.ok) {
@@ -26,6 +29,8 @@ function RestaurantList() {
 
   return (
     <div>
+      <NavBarTest />
+
       <h1 className="text-3xl font-bold mb-4 group-hover:">Restaurants: </h1>
       <ul>
         {restaurants.map((restaurant) => (
