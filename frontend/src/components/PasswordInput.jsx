@@ -10,7 +10,6 @@ const PasswordInput = ({ name, value, onChange }) => {
   return (
     <div className="relative mt-1">
       <input
-        id="password"
         type={showPassword ? "text" : "password"}
         name={name}
         value={value}
