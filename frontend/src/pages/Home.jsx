@@ -162,7 +162,7 @@ const Home = () => {
             Perhaps you own a restaurant?
           </h2>
           <Link
-            to="/account"
+            to="/profile"
             className="px-8 py-3 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition duration-300 inline-flex items-center"
           >
             <svg
