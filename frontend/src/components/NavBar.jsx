@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { useState, useEffect } from "react";
-
+import RestaurantLogo from '../assets/restaurant-logo.svg';
 function Navbar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -17,11 +17,11 @@ function Navbar() {
     checkAuthStatus();
 
     // Setup event listener for storage changes (helps with multi-tab scenarios)
-    window.addEventListener('storage', checkAuthStatus);
+    window.addEventListener("storage", checkAuthStatus);
 
     // Cleanup listener
     return () => {
-      window.removeEventListener('storage', checkAuthStatus);
+      window.removeEventListener("storage", checkAuthStatus);
     };
   }, []);
 
@@ -38,7 +38,7 @@ function Navbar() {
       setIsLoggedIn(false);
       setDropdownOpen(false);
       setIsOpen(false);
-      navigate("/")
+      navigate("/");
     }
   }
 
@@ -49,14 +49,14 @@ function Navbar() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownOpen && !event.target.closest('.profile-dropdown')) {
+      if (dropdownOpen && !event.target.closest(".profile-dropdown")) {
         setDropdownOpen(false);
       }
     }
-    
-    document.addEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownOpen]);
 
@@ -67,83 +67,28 @@ function Navbar() {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="flex items-center">
-                <a href="/" className="bg-amber-400 rounded-lg p-1.5 mr-2 hover:bg-amber-500 transition-colors">
-                  <svg
-                    className="h-6 w-6 text-white"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="currentColor"
-                  >
-                    <path
-                      d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    ></path>
-                  </svg>
+                <a
+                  href="/"
+                  className="bg-amber-400 rounded-lg p-1.5 mr-2 hover:bg-amber-500 transition-colors"
+                >
+                  <img src={RestaurantLogo} alt="Our logo" className="h-8 w-auto"/>
                 </a>
               </div>
             </div>
 
             <div className="hidden md:ml-8 md:flex md:space-x-6">
               <a
+                href="/restaurants"
+                className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
+              >
+                Restaurants
+              </a>
+              {isLoggedIn ? (<a
                 href="/"
                 className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
               >
-                <svg
-                  className="h-5 w-5 mr-1.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
-                </svg>
-                Dashboard
-              </a>
-              <a
-                href="/projects"
-                className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
-              >
-                <svg
-                  className="h-5 w-5 mr-1.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                </svg>
-                Projects
-              </a>
-              <a
-                href="/analytics"
-                className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
-              >
-                <svg
-                  className="h-5 w-5 mr-1.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-                Analytics
-              </a>
+                Reservations
+              </a>) : null }
             </div>
           </div>
 
@@ -175,7 +120,7 @@ function Navbar() {
                     </div>
                     <svg
                       className={`ml-1 h-4 w-4 text-gray-500 transition-transform duration-200 ${
-                        dropdownOpen ? 'transform rotate-180' : ''
+                        dropdownOpen ? "transform rotate-180" : ""
                       }`}
                       fill="none"
                       viewBox="0 0 24 24"
@@ -250,7 +195,9 @@ function Navbar() {
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-amber-500 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-400 transition-colors"
               aria-expanded={isOpen}
             >
-              <span className="sr-only">{isOpen ? 'Close menu' : 'Open menu'}</span>
+              <span className="sr-only">
+                {isOpen ? "Close menu" : "Open menu"}
+              </span>
               {isOpen ? (
                 <svg
                   className="h-6 w-6"
@@ -287,65 +234,22 @@ function Navbar() {
         </div>
       </div>
 
-      <div className={`md:hidden ${isOpen ? 'block' : 'hidden'}`}>
+      <div className={`md:hidden ${isOpen ? "block" : "hidden"}`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <a
-            href="/"
+            href="/restaurants"
             className="flex items-center text-gray-700 hover:bg-amber-50 hover:text-amber-500 px-3 py-2 rounded-md text-base font-medium transition-all"
           >
-            <svg
-              className="mr-2 h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-            Dashboard
+            Restaurants
           </a>
+          {isLoggedIn ? (
           <a
-            href="/projects"
+            href="/reservations"
             className="flex items-center text-gray-700 hover:bg-amber-50 hover:text-amber-500 px-3 py-2 rounded-md text-base font-medium transition-all"
           >
-            <svg
-              className="mr-2 h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-            Projects
+            Reservations
           </a>
-          <a
-            href="/analytics"
-            className="flex items-center text-gray-700 hover:bg-amber-50 hover:text-amber-500 px-3 py-2 rounded-md text-base font-medium transition-all"
-          >
-            <svg
-              className="mr-2 h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-            Analytics
-          </a>
+          ) : null }
         </div>
         <div className="pt-4 pb-3 border-t border-gray-200">
           <div className="mt-3 space-y-1 px-2">
