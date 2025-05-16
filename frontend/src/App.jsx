@@ -7,11 +7,8 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-<<<<<<< Updated upstream
-=======
 import ProfilePage from "./pages/ProfilePage";
 import AddRestaurant from "./pages/AddRestaurant";
->>>>>>> Stashed changes
 
 const router = createBrowserRouter([
   {
@@ -34,8 +31,6 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register />,
   },
-<<<<<<< Updated upstream
-=======
   {
     path: "/profile",
     element: (
@@ -48,7 +43,6 @@ const router = createBrowserRouter([
     path: "/add-restaurant",
     element: <AddRestaurant />,
   },
->>>>>>> Stashed changes
 ]);
 
 function App() {
