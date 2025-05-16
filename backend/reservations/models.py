@@ -20,4 +20,5 @@ class Reservation(models.Model):
 
     def __str__(self):
         return f"{self.client.user.email} - {self.restaurant.name} at {self.date_time}"
+
     
