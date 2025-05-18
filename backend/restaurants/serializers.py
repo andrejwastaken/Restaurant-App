@@ -3,11 +3,16 @@ from rest_framework.validators import UniqueValidator
 
 from .models import Restaurant, RestaurantSetup
 
-
+class RestaurantSetupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RestaurantSetup
+        fields = ['num_tables', 'num_tables_smoking', 'timeslots_by_day', 'tables_by_size']
+        
 class RestaurantSerializer(serializers.ModelSerializer):
+    restaurant_setup = RestaurantSetupSerializer(read_only = True)
     class Meta:
         model = Restaurant
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'is_validated', 'restaurant_setup']
 
 class CreateRestaurantSetupSerializer(serializers.ModelSerializer):
     class Meta:
