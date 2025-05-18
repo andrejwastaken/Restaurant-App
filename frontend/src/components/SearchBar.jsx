@@ -1,7 +1,7 @@
 import Logo from "./Logo";
 import Search from "./Search";
 
-function SearchBar() {
+function SearchBar({ query, setQuery }) {
   return (
     <header className="bg-white dark:bg-amber-500 shadow-md sticky">
       <div className="container mx-auto px-4 py-3">
@@ -18,7 +18,7 @@ function SearchBar() {
               - md:flex-grow: Allows the search area to expand and fill available space on medium screens and up.
               - md:max-w-lg / lg:max-w-xl: Sets a maximum width for the search bar on larger screens to prevent it from becoming too wide. Adjust as needed.
             */}
-            <Search />
+            <Search query={query} setQuery={setQuery}/>
           </div>
         </div>
       </div>
