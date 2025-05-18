@@ -28,7 +28,7 @@ function RestaurantFormItem({ item, name, checkState }) {
           return <span className="italic text-gray-400">Empty</span>;
         }
 
-        return <span className="italic text-gray-500">Timeslots filled</span>;
+        return <span className="italic text-gray-500">Time slots filled</span>;
       }
 
       return <span className="italic text-gray-500">{item}</span>;

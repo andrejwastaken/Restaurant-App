@@ -40,8 +40,12 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/add-restaurant",
-    element: <AddRestaurant />,
+    path: "/manage-restaurants",
+    element: (
+      <ProtectedRoute>
+        <AddRestaurant />
+      </ProtectedRoute>
+    ),
   },
 ]);
 
