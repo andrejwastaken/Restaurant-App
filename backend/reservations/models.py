@@ -17,7 +17,7 @@ class Reservation(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     comment = models.TextField(blank=True, null=True)
     is_smoker = models.BooleanField(default = False)
-
+    
     def __str__(self):
         return f"{self.client.user.email} - {self.restaurant.name} at {self.date_time}"
 

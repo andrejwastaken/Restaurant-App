@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-import RestaurantFormEditor from "../components/RestaurantFormEditor";
-import RestaurantFormItem from "../components/RestaurantFormItem";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import api from "../../api/api";
+import RestaurantFormEditor from "../../components/RestaurantFormEditor";
+import RestaurantFormItem from "../../components/RestaurantFormItem";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 // check state for Empty write
 const initialTimeSlots = {

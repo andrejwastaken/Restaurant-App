@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import PasswordInput from "../components/PasswordInput";
-import api from "../api/api";
+import PasswordInput from "../../components/PasswordInput";
+import api from "../../api/api";
 
-import Loading from "../components/Loading";
+import Loading from "../../components/Loading";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -101,11 +101,11 @@ function Login() {
                   Password
                 </label>
               </div>
-                <PasswordInput
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
+              <PasswordInput
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
             </div>
           </div>
 

@@ -20,6 +20,7 @@ class UserUpdateView(APIView):
         if serializer.is_valid():
             # go zacuvuvam prvo, deka mozebi nema da se promeni passwordot
             user = serializer.save()
+
             if 'password' in request.data and request.data['password']:
                 user = request.user
                 user.set_password(request.data['password'])
@@ -34,5 +35,7 @@ class UserUpdateView(APIView):
                     "message": "User updated successfully!",
                     "access_token": access_token
                 })
+
             return Response({"message": "User updated successfully!"})
+
         return Response(serializer.errors, status=400)

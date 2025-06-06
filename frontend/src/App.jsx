@@ -1,14 +1,19 @@
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import RestaurantList from "./pages/RestaurantList";
 import Home from "./pages/Home";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
+import Register from "./pages/LoginRegisterPages/Register";
+import Login from "./pages/LoginRegisterPages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ProfilePage from "./pages/ProfilePage";
-import AddRestaurant from "./pages/AddRestaurant";
+import ProfilePage from "./pages/UserManagementPages/ProfilePage";
+import AddRestaurant from "./pages/UserManagementPages/AddRestaurant";
+import PersonalInfo from "./components/PersonalInfo";
 
 const router = createBrowserRouter([
   {
@@ -32,12 +37,22 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/profile",
+    path: "/user",
     element: (
       <ProtectedRoute>
         <ProfilePage />
       </ProtectedRoute>
     ),
+    children: [
+      {
+        index: true,
+        element: <Navigate to="personal-info" replace />,
+      },
+      {
+        path: "personal-info",
+        element: <PersonalInfo />,
+      },
+    ],
   },
   {
     path: "/manage-restaurants",

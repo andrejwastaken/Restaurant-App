@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import PasswordInput from "../components/PasswordInput";
-import api from "../api/api";
+import PasswordInput from "../../components/PasswordInput";
+import api from "../../api/api";
 
-import Loading from "../components/Loading";
+import Loading from "../../components/Loading";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -160,11 +160,11 @@ function Register() {
               >
                 Password
               </label>
-                <PasswordInput
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  />
+              <PasswordInput
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
               <p className="mt-2 text-sm text-red-600 font-medium">
                 {formErrors.password ? formErrors.password : ""}
               </p>
@@ -177,11 +177,11 @@ function Register() {
               >
                 Confirm Password
               </label>
-                <PasswordInput
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
+              <PasswordInput
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
               <p className="mt-2 text-sm text-red-600 font-medium">
                 {formErrors.confirmPassword ? formErrors.confirmPassword : ""}
               </p>

@@ -7,6 +7,7 @@ const PasswordInput = ({ name, value, onChange }) => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   return (
     <div className="relative mt-1">
       <input
