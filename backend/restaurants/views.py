@@ -9,6 +9,8 @@ from .serializers import RestaurantSerializer, CreateRestaurantSerializer
 # Create your views here.
 
 class RestaurantListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         restaurants = Restaurant.objects.all()
         serializer = RestaurantSerializer(restaurants, many=True)
@@ -25,3 +27,11 @@ class CreateRestaurantView(APIView):
             return Response({"message": "Restaurant created successfully", 'id': restaurant.id}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class OwnedRestaurantsListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        restaurants = Restaurant.objects.filter(owner__user=request.user)
+        serializer = RestaurantSerializer(restaurants, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

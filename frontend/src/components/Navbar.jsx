@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import api from "../api/api";
 import { useState, useEffect } from "react";
-import RestaurantLogo from '../assets/restaurant-logo.svg';
+
+import api from "../api/api";
+import RestaurantLogo from "../assets/restaurant-logo.svg";
+
 function Navbar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -71,7 +73,11 @@ function Navbar() {
                   href="/"
                   className="bg-amber-400 rounded-lg p-1.5 mr-2 hover:bg-amber-500 transition-colors"
                 >
-                  <img src={RestaurantLogo} alt="Our logo" className="h-8 w-auto"/>
+                  <img
+                    src={RestaurantLogo}
+                    alt="Our logo"
+                    className="h-8 w-auto"
+                  />
                 </a>
               </div>
             </div>
@@ -83,12 +89,14 @@ function Navbar() {
               >
                 Restaurants
               </a>
-              {isLoggedIn ? (<a
-                href="/"
-                className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
-              >
-                Reservations
-              </a>) : null }
+              {isLoggedIn ? (
+                <a
+                  href="/"
+                  className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
+                >
+                  Reservations
+                </a>
+              ) : null}
             </div>
           </div>
 
@@ -139,7 +147,7 @@ function Navbar() {
                 {dropdownOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 focus:outline-none">
                     <a
-                      href="/profile"
+                      href="/user"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <svg
@@ -243,13 +251,13 @@ function Navbar() {
             Restaurants
           </a>
           {isLoggedIn ? (
-          <a
-            href="/reservations"
-            className="flex items-center text-gray-700 hover:bg-amber-50 hover:text-amber-500 px-3 py-2 rounded-md text-base font-medium transition-all"
-          >
-            Reservations
-          </a>
-          ) : null }
+            <a
+              href="/reservations"
+              className="flex items-center text-gray-700 hover:bg-amber-50 hover:text-amber-500 px-3 py-2 rounded-md text-base font-medium transition-all"
+            >
+              Reservations
+            </a>
+          ) : null}
         </div>
         <div className="pt-4 pb-3 border-t border-gray-200">
           <div className="mt-3 space-y-1 px-2">

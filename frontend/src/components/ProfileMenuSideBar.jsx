@@ -1,18 +1,39 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useProfileData } from "../contexts/ProfileDataContext";
+
+import api from "../api/api";
 
 function ProfileMenuSideBar() {
-  const [activeButton, setActiveButton] = useState("personal-info");
+  const { user } = useProfileData();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    const refresh = localStorage.getItem("refresh");
+
+    try {
+      await api.post("/auth/logout", { refresh });
+    } catch (error) {
+      console.error("Logout error:", error.response?.data || error.message);
+    } finally {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      navigate("/");
+    }
+  }
+
+  const navLinkBaseClasses =
+    "text-center w-full text-left px-4 py-6 rounded-none text-sm font-medium text-gray-700 hover:bg-gray-300 hover:text-gray-900 focus:outline-none transition-colors ease-in-out duration-150 border-b-2 border-gray-200";
 
   return (
     <div className="bg-white flex flex-col shadow-md overflow-y-auto flex-grow">
       {/* Name Box */}
       <div className="p-6 mt-1">
         <div className="flex flex-col items-center text-center space-y-2.5">
-          <h5 className="text-2xl font-semibold text-gray-800">Marko</h5>
-          <p className="text-[15px] text-gray-600 font-medium">
-            popovicmarko1343@gmail.com
-          </p>
+          <h5 className="text-2xl font-semibold text-gray-800">
+            {user.username}
+          </h5>
+          <p className="text-[15px] text-gray-600 font-medium">{user.email}</p>
         </div>
       </div>
 
@@ -24,52 +45,33 @@ function ProfileMenuSideBar() {
         <nav className="flex flex-col">
           <NavLink
             to="personal-info"
-            className={`
-              text-center w-full text-left px-4 py-6 rounded-none 
-              text-sm font-medium 
-              text-gray-700 hover:bg-gray-300 hover:text-gray-900 focus:outline-none transition-colors ease-in-out duration-150 
-              border-b-2 border-gray-200
-              ${
-                activeButton === "personal-info"
-                  ? "bg-gray-300 text-gray-900"
-                  : "bg-white"
-              }
-            `}
-            onClick={() => setActiveButton("personal-info")}
+            className={({ isActive }) =>
+              `${navLinkBaseClasses} ${
+                isActive ? "bg-gray-300 text-gray-900" : "bg-white"
+              }`
+            }
           >
             Personal Information
           </NavLink>
 
           <NavLink
-            to="personal-info"
-            className={`
-              text-center w-full text-left px-4 py-6 rounded-none 
-              text-sm font-medium 
-              text-gray-700 hover:bg-gray-300 hover:text-gray-900 focus:outline-none transition-colors ease-in-out duration-150 
-              border-b-2 border-gray-200
-              ${
-                activeButton === "reservation-history"
-                  ? "bg-gray-300 text-gray-900"
-                  : "bg-white"
-              }
-            `}
+            to="reservation-history"
+            className={({ isActive }) =>
+              `${navLinkBaseClasses} ${
+                isActive ? "bg-gray-300 text-gray-900" : "bg-white"
+              }`
+            }
           >
             Reservation History
           </NavLink>
 
           <NavLink
-            to="personal-info"
-            className={`
-              text-center w-full text-left px-4 py-6 rounded-none 
-              text-sm font-medium 
-              text-gray-700 hover:bg-gray-300 hover:text-gray-900 focus:outline-none transition-colors ease-in-out duration-150 
-              border-b-2 border-gray-200
-              ${
-                activeButton === "favourite-restaurants"
-                  ? "bg-gray-300 text-gray-900"
-                  : "bg-white"
-              }
-            `}
+            to="favourite-restaurants"
+            className={({ isActive }) =>
+              `${navLinkBaseClasses} ${
+                isActive ? "bg-gray-300 text-gray-900" : "bg-white"
+              }`
+            }
           >
             Favourite Restaurants
           </NavLink>
@@ -81,19 +83,27 @@ function ProfileMenuSideBar() {
 
       <div className="px-6 pb-6 pt-3">
         <nav className="flex flex-col">
-          <button
-            type="button"
-            className="text-center w-full text-left px-4 py-6 rounded-none text-sm font-medium text-gray-700 hover:bg-gray-300 hover:text-gray-900 focus:outline-none transition-colors ease-in-out duration-150 border-b-2 border-gray-200"
+          <NavLink
+            to="owned-restaurants"
+            className={({ isActive }) =>
+              `${navLinkBaseClasses} ${
+                isActive ? "bg-gray-300 text-gray-900" : "bg-white"
+              }`
+            }
           >
             Owned Restaurants
-          </button>
+          </NavLink>
 
-          <button
-            type="button"
-            className="text-center w-full text-left px-4 py-6 rounded-none text-sm font-medium text-gray-700 hover:bg-gray-300 hover:text-gray-900 focus:outline-none transition-colors ease-in-out duration-150 border-b-2 border-gray-200"
+          <NavLink
+            to="add-restaurant"
+            className={({ isActive }) =>
+              `${navLinkBaseClasses} ${
+                isActive ? "bg-gray-300 text-gray-900" : "bg-white"
+              }`
+            }
           >
             Add a Restaurant
-          </button>
+          </NavLink>
         </nav>
       </div>
 
@@ -104,6 +114,7 @@ function ProfileMenuSideBar() {
         <nav className="flex flex-col">
           <button
             type="button"
+            onClick={handleLogout}
             className="flex justify-center items-center w-full text-left px-4 py-6 rounded-none text-sm font-medium text-gray-700 hover:bg-gray-300 hover:text-gray-900 focus:outline-none transition-colors ease-in-out duration-150 border-b-2 border-gray-200"
           >
             Logout <span className="ml-2 text-xl"> &rarr;</span>

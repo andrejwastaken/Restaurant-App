@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Menu } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import Profile from "../../assets/profile.svg";
 import api from "../../api/api";
-import PasswordInput from "../../components/PasswordInput";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import ProfileMenu from "../../components/ProfileMenu";
@@ -38,11 +34,26 @@ const MODAL_CONFIG = {
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState({});
-
   const [isLoading, setIsLoading] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [initialDataForModal, setInitialDataForModal] = useState(null);
   const [isLoadingDuringSubmit, setIsLoadingDuringSubmit] = useState(false);
+  const [addRestaurantData, setAddRestaurantData] = useState({
+    basicInformation: {
+      name: "",
+      description: "",
+    },
+    tableInformation: [],
+    timeslotInformation: {
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+      Sunday: [],
+    },
+  });
 
   useEffect(() => {
     setIsLoading(true);
@@ -63,10 +74,7 @@ const ProfilePage = () => {
     fetchProfile();
   }, []);
 
-  const handleLoadingDuringSubmit = () => {
-    setIsLoadingDuringSubmit(false);
-  };
-
+  // MODAL SAVING LOGIC
   const openModal = (modalType, data) => {
     if (MODAL_CONFIG[modalType]) {
       setActiveModal(modalType);
@@ -107,13 +115,13 @@ const ProfilePage = () => {
 
     if (userData[fieldKey] === updatedData[fieldKey]) {
       toast.error("No changes to your information has been made.");
-      closeModal();
+      setIsLoadingDuringSubmit(false);
       return;
     }
 
     if (updatedData[fieldKey].trim().length === 0) {
       toast.error("Personal information must be included.");
-      closeModal();
+      setIsLoadingDuringSubmit(false);
       return;
     }
 
@@ -139,10 +147,18 @@ const ProfilePage = () => {
     setInitialDataForModal(null);
   };
 
+  //ADD RESTAURANT SAVING LOGIC
+  function handleSaveAddRestaurantItem(updatedData) {
+    const finalAddRestaurantData = { ...addRestaurantData, ...updatedData };
+    setAddRestaurantData(finalAddRestaurantData);
+  }
+
   const profileContextValue = {
     user: userData,
     openModal: openModal,
     isLoadingDuringSubmit: isLoadingDuringSubmit,
+    addRestaurantData: addRestaurantData,
+    handleSaveAddRestaurantItem: handleSaveAddRestaurantItem,
   };
 
   const CurrentModal = activeModal ? MODAL_CONFIG[activeModal] : null;

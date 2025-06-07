@@ -64,7 +64,7 @@ function ModalShell({ title, children, onClose }) {
             <button
               type="submit"
               form="modal-form"
-              className="w-full bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+              className="w-full bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             >
               Submit
             </button>

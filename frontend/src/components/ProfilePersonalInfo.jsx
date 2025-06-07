@@ -3,7 +3,7 @@ import { useProfileData } from "../contexts/ProfileDataContext";
 import PersonalInfoLabel from "./PersonalInfoLabel";
 import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
 
-function PersonalInfo() {
+function ProfilePersonalInfo() {
   const { user, openModal } = useProfileData();
 
   return (
@@ -40,7 +40,7 @@ function PersonalInfo() {
         <button
           onClick={() => openModal("EDIT_PASSWORD", { password: "" })}
           form="modal-form"
-          className="w-full bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 focus:outline-none"
+          className="w-full bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 focus:outline-none"
         >
           Change Password
         </button>
@@ -49,4 +49,4 @@ function PersonalInfo() {
   );
 }
 
-export default PersonalInfo;
+export default ProfilePersonalInfo;

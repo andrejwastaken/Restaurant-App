@@ -7,13 +7,9 @@ function RestaurantFormItem({ item, name, checkState }) {
         return <span className="italic text-gray-400">Empty</span>;
       }
 
-      return item.map((table, idx) => (
-        <div key={idx}>
-          <span className="italic text-gray-500">
-            Table seating for {table.size}: {table.count} tables
-          </span>
-        </div>
-      ));
+      return (
+        <div className="italic text-gray-500">Table configuration filled</div>
+      );
     } else {
       if (item === checkState) {
         return <span className="italic text-gray-400">Empty</span>;
