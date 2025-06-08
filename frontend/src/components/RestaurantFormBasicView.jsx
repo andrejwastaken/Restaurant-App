@@ -10,6 +10,8 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
       : {
           name: "",
           description: "",
+          address: "",
+          phone_number: ""
         }
   );
 
@@ -34,6 +36,8 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
         <RestaurantFormBasicViewContent
           name={currentBasicInformation.name}
           description={currentBasicInformation.description}
+          address={currentBasicInformation.address}
+          phone_number={currentBasicInformation.phone_number}
           onChange={handleChange}
         />
       </div>

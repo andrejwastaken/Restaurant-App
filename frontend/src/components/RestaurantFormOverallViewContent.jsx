@@ -5,6 +5,8 @@ function RestaurantFormOverallViewContent({
   name,
   description,
   tableSizes,
+  address,
+  phone_number,
   smokingTables,
   timeslots,
   initialTimeSlots,
@@ -23,6 +25,8 @@ function RestaurantFormOverallViewContent({
           name="Description"
           checkState=""
         />
+        <RestaurantFormItem item={address} name="Address" checkState="" />
+        <RestaurantFormItem item={phone_number} name="Phone Number" checkState="" />
       </div>
 
       <RestaurantFormEditor

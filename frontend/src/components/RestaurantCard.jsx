@@ -13,17 +13,13 @@ export default function RestaurantCard({ restaurant }) {
       <div className="border rounded-lg shadow p-4">
         <h2 className="text-xl font-bold">{restaurant.name}</h2>
         <p>{restaurant.description}</p>
-        <div className="flex justify-between mt-2">
-          <button
-            onClick={openModal}
+        <div className="flex justify-end  mt-2">
+          <Link
+            to="/restaurant-details/{restaurant.id}"
+            state={{ restaurant }}
             className="mt-2 bg-amber-500 text-white py-1 px-4 rounded hover:bg-amber-600"
           >
             View details.
-          </button>
-          <Link to="/">
-            <button className="mt-2 bg-blue-500 text-white py-1 px-4 rounded hover:bg-blue-600">
-              Reserve a spot.
-            </button>
           </Link>
         </div>
       </div>

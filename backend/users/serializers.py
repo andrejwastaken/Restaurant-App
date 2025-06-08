@@ -17,6 +17,5 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
         if password:
             instance.set_password(password)
-
         instance.save()
         return instance

@@ -42,6 +42,8 @@ const ProfilePage = () => {
     basicInformation: {
       name: "",
       description: "",
+      address: "",
+      phone_number: "",
     },
     tableInformation: [],
     timeslotInformation: {

@@ -3,7 +3,8 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import PasswordInput from "../../components/PasswordInput";
 import api from "../../api/api";
-
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import Loading from "../../components/Loading";
 
 function Login() {
@@ -41,6 +42,7 @@ function Login() {
       localStorage.setItem("refresh", res.data.refresh);
 
       navigate("/");
+      toast.success("Successfully logged in!");
     } catch (error) {
       const detail = error.response.data.detail + ".";
       toast.error(detail);
@@ -57,6 +59,8 @@ function Login() {
   }
 
   return (
+    <>
+    <Navbar/>
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-amber-100 p-4">
       <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
         <div className="bg-amber-600 px-8 py-5">
@@ -133,6 +137,8 @@ function Login() {
         </div>
       </div>
     </div>
+    <Footer/>
+  </>
   );
 }
 

@@ -17,6 +17,8 @@ function RestaurantFormOverallView({
         <RestaurantFormOverallViewContent
           name={basicInformation.name}
           description={basicInformation.description}
+          address={basicInformation.address}
+          phone_number={basicInformation.phone_number}
           tableSizes={tableSizes}
           timeslots={timeslots}
           initialTimeSlots={initialTimeSlots}

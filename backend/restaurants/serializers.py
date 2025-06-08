@@ -12,7 +12,7 @@ class RestaurantSerializer(serializers.ModelSerializer):
     restaurant_setup = RestaurantSetupSerializer(read_only = True)
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'description', 'is_validated', 'restaurant_setup']
+        fields = ['id', 'name', 'description', 'is_validated', 'address', 'phone_number', 'restaurant_setup']
 
 class CreateRestaurantSetupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,7 +28,7 @@ class CreateRestaurantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Restaurant
-        fields = ['name', 'description', 'restaurant_setup']
+        fields = ['name', 'description', 'address', 'phone_number', 'restaurant_setup']
 
     def create(self, validated_data):
         setup_data = validated_data.pop('restaurant_setup')

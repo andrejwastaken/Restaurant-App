@@ -36,6 +36,8 @@ function ProfileAddRestaurant() {
     if (
       !basicInformation.name ||
       !basicInformation.description ||
+      !basicInformation.address ||
+      !basicInformation.phone_number ||
       tableInformation.length === 0 ||
       timeSlotIsEmpty
     ) {
@@ -54,6 +56,8 @@ function ProfileAddRestaurant() {
       const payload = {
         name: basicInformation.name,
         description: basicInformation.description,
+        address: basicInformation.address,
+        phone_number: basicInformation.phone_number,
         restaurant_setup: {
           num_tables: numTables,
           timeslots_by_day: timeslotInformation,

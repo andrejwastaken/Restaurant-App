@@ -45,24 +45,7 @@ const Home = () => {
                 </svg>
                 Find Restaurants
               </Link>
-              <Link
-                to="/reservations"
-                className="px-8 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition duration-300 flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Make a Reservation
-              </Link>
+              
             </div>
           </div>
         </div>
@@ -71,7 +54,7 @@ const Home = () => {
       <div className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-16">
-            Why Choose Our Service
+            Why Choose Our Service:
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -119,11 +102,10 @@ const Home = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Curated Menus
+                Curated Choice
               </h3>
               <p className="text-gray-600 text-center">
-                Explore detailed menus and special dishes from the best
-                restaurants around you.
+                Explore our partner restaurants and the special experience they offer.
               </p>
             </div>
 
@@ -145,11 +127,10 @@ const Home = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Verified Reviews
+                Verified Restaurants
               </h3>
               <p className="text-gray-600 text-center">
-                Make informed decisions with genuine reviews from our community
-                of food lovers.
+                Make informed decisions using our map, that has genuine selection of restaurants that have been vetted by our team.  
               </p>
             </div>
           </div>
@@ -162,7 +143,7 @@ const Home = () => {
             Perhaps you own a restaurant?
           </h2>
           <Link
-            to="/profile"
+            to="/user/add-restaurant"
             className="px-8 py-3 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition duration-300 inline-flex items-center"
           >
             <svg

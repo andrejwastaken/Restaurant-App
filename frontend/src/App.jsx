@@ -26,11 +26,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/restaurants",
-    element: (
-      <ProtectedRoute>
-        <RestaurantList />
-      </ProtectedRoute>
-    ),
+    element: <RestaurantList />,
   },
   {
     path: "/login",

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 
 import api from "../api/api";
 import RestaurantLogo from "../assets/restaurant-logo.svg";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -41,6 +43,7 @@ function Navbar() {
       setDropdownOpen(false);
       setIsOpen(false);
       navigate("/");
+      toast.success("Logged out successfully");
     }
   }
 
@@ -90,12 +93,12 @@ function Navbar() {
                 Restaurants
               </a>
               {isLoggedIn ? (
-                <a
-                  href="/"
+                <Link
+                  to="/user/reservation-history"
                   className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
                 >
-                  Reservations
-                </a>
+                  Your Reservations
+                </Link>
               ) : null}
             </div>
           </div>
@@ -251,12 +254,12 @@ function Navbar() {
             Restaurants
           </a>
           {isLoggedIn ? (
-            <a
-              href="/reservations"
-              className="flex items-center text-gray-700 hover:bg-amber-50 hover:text-amber-500 px-3 py-2 rounded-md text-base font-medium transition-all"
+            <Link
+              to="/user/reservation-history"
+              className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
             >
-              Reservations
-            </a>
+              Your Reservations
+            </Link>
           ) : null}
         </div>
         <div className="pt-4 pb-3 border-t border-gray-200">
