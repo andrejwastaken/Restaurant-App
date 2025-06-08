@@ -45,6 +45,10 @@ class TableType(models.Model):
     )
     capacity = models.PositiveIntegerField(default=2)
     is_smoking = models.BooleanField(default=False)
+    name= models.CharField(
+        max_length=100, 
+        help_text="A descriptive name for this table type (e.g., '2-person table', '4-person booth')."
+    )
     # The total number of tables of this type the restaurant has.
     total_quantity = models.PositiveIntegerField(default=1)
 
