@@ -1,6 +1,5 @@
 from django.db import models
 from users.models import User
-from datetime import time
 
 class OwnerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -41,45 +40,102 @@ class TableType(models.Model):
     setup = models.ForeignKey(
         RestaurantSetup, 
         on_delete=models.CASCADE, 
-        related_name='table_types'
+        related_name='table_types',
+        help_text="The restaurant setup this table type belongs to."
     )
-    capacity = models.PositiveIntegerField(default=2)
-    is_smoking = models.BooleanField(default=False)
     name= models.CharField(
         max_length=100, 
         help_text="A descriptive name for this table type (e.g., '2-person table', '4-person booth')."
     )
-    # The total number of tables of this type the restaurant has.
-    total_quantity = models.PositiveIntegerField(default=1)
+    capacity = models.PositiveIntegerField(
+        default=2,
+        help_text="The maximum number of guests this type of table can accomodate"
+    )
+
+    class Meta:
+        unique_together = ('setup', 'name')
+        verbose_name='Table Type'
+        verbose_name_plural='Table Types'
 
     def __str__(self):
         return f'{self.name} ({self.capacity}-person) for {self.setup.restaurant.name}'
 
-# MODEL 4: TIME SLOTS
-# An owner creates these records to make a specific table type available at a specific time.
-class TimeSlot(models.Model):
+class Table(models.Model):
+    SHAPE_CHOICES = (
+        ('RECTANGLE', 'Rectangle'),
+        ('CIRCLE', 'Circle'),
+    )
+
+    setup = models.ForeignKey(
+        RestaurantSetup,
+        on_delete=models.CASCADE,
+        related_name='tables',
+        help_text="The restaurant setup this table belongs to."
+    )
+    table_type = models.ForeignKey(
+        TableType,
+        on_delete=models.CASCADE,
+        related_name='tables',
+        help_text="The table type this table belongs to."
+    )
+    name = models.CharField(max_length=50)
+    is_smoking = models.BooleanField(
+        default=False,
+        help_text="Is smoking allowed on this table"
+    )
+
+    #CANVAS POSITIONING LOGIC
+    x_position = models.PositiveIntegerField()
+    y_position = models.PositiveIntegerField()
+    width = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()
+    shape = models.CharField(
+        max_length = 10,
+        choices=SHAPE_CHOICES,
+        default='RECTANGLE',
+        help_text="The shape this table has on canvas"
+    )
+
+    class Meta:
+        unique_together = ('setup', 'name')
+        verbose_name='Table'
+        verbose_name_plural='Tables'
+
+    def __str__(self):
+        return f"Table {self.name} for type {self.table_type.name} in {self.setup.restaurant.name}"
+
+# OPERATION HOURS MODEL FOR DEFAULT BEHAVIOUR FOR A RESTAURANT
+class OperationHours(models.Model):
+    DAY_CHOICES = (
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday'),
+    )
+
     setup = models.ForeignKey(
         RestaurantSetup, 
         on_delete=models.CASCADE, 
-        related_name='time_slots'
+        related_name='operating_hours'
     )
-    table_type = models.ForeignKey(
-        TableType, 
-        on_delete=models.CASCADE, 
-        related_name='time_slots'
+    day_of_week = models.IntegerField(
+        choices=DAY_CHOICES,
+        help_text="The day of the week this table belongs to."
     )
-    date = models.DateField()
-    time = models.TimeField()
-    
-    # This is how many tables of this type are available for this specific slot.
-    # It can be pre-filled by the owner. The reservation app will then decrement this.
-    quantity_available = models.PositiveIntegerField()
+    open_time = models.TimeField()
+    close_time = models.TimeField()
 
     class Meta:
         # A specific table type can only have one entry for a given date and time.
-        unique_together = ('table_type', 'date', 'time')
-        ordering = ['date', 'time']
+        unique_together = ('setup', 'day_of_week', 'open_time', 'close_time')
+        ordering = ['day_of_week', 'open_time']
+        verbose_name='Operating Hour'
+        verbose_name_plural='Operating Hours'
 
     def __str__(self):
-        return f'{self.quantity_available} x {self.table_type.name} available at {self.time} on {self.date}'
-    
+        return (f'{self.get_day_of_week_display()}: '
+                f'{self.open_time.strftime("%H:%M")} - '
+                f'{self.close_time.strftime("%H:%M")}')

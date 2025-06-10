@@ -1,40 +1,39 @@
 from django.db import transaction
-from restaurants.models import TimeSlot
 from .models import Reservation
 from django.core.exceptions import ValidationError
 
 @transaction.atomic # Ensure that all operations are atomic (all or nothing)
-def create_reservation(request_data):
-    time_slot_id = request_data.get('time_slot_id')
-    client_profile = request_data.get('client')
-    num_guests = request_data.get('number_of_guests')
-
-    if not time_slot_id or not client_profile or not num_guests:
-        raise ValueError("Missing required fields: time_slot_id, client, or number_of_guests")
-    
-    try:
-        slot_to_book = TimeSlot.objects.select_for_update().get(id=time_slot_id)
-    except TimeSlot.DoesNotExist:
-        raise ValueError("Time slot does not exist")
-
-    if slot_to_book.quantity_available <= 0:
-        raise ValueError("No available slots for this time slot.")
-
-    if num_guests > slot_to_book.table_type.capacity:
-        raise ValueError(f"Number of guests ({num_guests}) exceeds the capacity of the selected table ({slot_to_book.table_type.capacity}).")
-    
-
-    new_reservation = Reservation.objects.create(
-        time_slot=slot_to_book, 
-        client=client_profile, 
-        number_of_guests=num_guests, 
-        comment=request_data.get('comment', ''),
-        )
-
-    slot_to_book.quantity_available -= 1
-    slot_to_book.save()
-
-    return new_reservation
+# def create_reservation(request_data):
+#     time_slot_id = request_data.get('time_slot_id')
+#     client_profile = request_data.get('client')
+#     num_guests = request_data.get('number_of_guests')
+#
+#     if not time_slot_id or not client_profile or not num_guests:
+#         raise ValueError("Missing required fields: time_slot_id, client, or number_of_guests")
+#
+#     try:
+#         slot_to_book = TimeSlot.objects.select_for_update().get(id=time_slot_id)
+#     except TimeSlot.DoesNotExist:
+#         raise ValueError("Time slot does not exist")
+#
+#     if slot_to_book.quantity_available <= 0:
+#         raise ValueError("No available slots for this time slot.")
+#
+#     if num_guests > slot_to_book.table_type.capacity:
+#         raise ValueError(f"Number of guests ({num_guests}) exceeds the capacity of the selected table ({slot_to_book.table_type.capacity}).")
+#
+#
+#     new_reservation = Reservation.objects.create(
+#         time_slot=slot_to_book,
+#         client=client_profile,
+#         number_of_guests=num_guests,
+#         comment=request_data.get('comment', ''),
+#         )
+#
+#     slot_to_book.quantity_available -= 1
+#     slot_to_book.save()
+#
+#     return new_reservation
 
 def update_reservation(reservation_id, user_id, request_data):
     try:

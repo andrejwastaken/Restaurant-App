@@ -2,7 +2,6 @@ from django.db import models
 from users.models import User
 from restaurants.models import Restaurant
 from clients.models import ClientProfile
-from restaurants.models import TimeSlot
 
 # Create your models here.
 class Reservation(models.Model):
@@ -17,11 +16,11 @@ class Reservation(models.Model):
     # A TimeSlot can only ever belong to one RestaurantSetup, which belongs to one Restaurant. 
     # By linking the Reservation to the TimeSlot, it automatically and reliably inherits the correct restaurant. 
 
-    time_slot = models.ForeignKey(
-        TimeSlot,
-        on_delete=models.CASCADE, # When a TimeSlot is deleted, reservations for it are also deleted.
-        related_name='reservations'
-    )
+    # time_slot = models.ForeignKey(
+    #     TimeSlot,
+    #     on_delete=models.CASCADE, # When a TimeSlot is deleted, reservations for it are also deleted.
+    #     related_name='reservations'
+    # )
     client = models.ForeignKey(ClientProfile, on_delete=models.CASCADE)
     number_of_guests = models.PositiveIntegerField(
         help_text="How many guests are attending (must be less than or equal to the table's capacity)."
