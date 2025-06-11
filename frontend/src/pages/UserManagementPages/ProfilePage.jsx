@@ -46,15 +46,7 @@ const ProfilePage = () => {
       phone_number: "",
     },
     tableInformation: [],
-    timeslotInformation: {
-      Monday: [],
-      Tuesday: [],
-      Wednesday: [],
-      Thursday: [],
-      Friday: [],
-      Saturday: [],
-      Sunday: [],
-    },
+    operatingHoursInformation: [],
   });
 
   useEffect(() => {

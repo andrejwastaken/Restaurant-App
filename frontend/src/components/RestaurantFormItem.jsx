@@ -7,9 +7,7 @@ function RestaurantFormItem({ item, name, checkState }) {
         return <span className="italic text-gray-400">Empty</span>;
       }
 
-      return (
-        <div className="italic text-gray-500">Table configuration filled</div>
-      );
+      return <div className="italic text-gray-500">Configuration filled</div>;
     } else {
       if (item === checkState) {
         return <span className="italic text-gray-400">Empty</span>;

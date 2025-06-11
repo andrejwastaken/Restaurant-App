@@ -9,7 +9,6 @@ function RestaurantFormOverallViewContent({
   phone_number,
   smokingTables,
   timeslots,
-  initialTimeSlots,
   onClick,
 }) {
   return (
@@ -26,7 +25,11 @@ function RestaurantFormOverallViewContent({
           checkState=""
         />
         <RestaurantFormItem item={address} name="Address" checkState="" />
-        <RestaurantFormItem item={phone_number} name="Phone Number" checkState="" />
+        <RestaurantFormItem
+          item={phone_number}
+          name="Phone Number"
+          checkState=""
+        />
       </div>
 
       <RestaurantFormEditor
@@ -43,16 +46,12 @@ function RestaurantFormOverallViewContent({
       </div>
 
       <RestaurantFormEditor
-        label="Timeslot Information"
-        handleClick={() => onClick("timeslotInfo")}
+        label="Operating Hours Information"
+        handleClick={() => onClick("operatingHours")}
       />
 
       <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200 space-y-2 mb-6">
-        <RestaurantFormItem
-          item={timeslots}
-          name="Timeslots"
-          checkState={initialTimeSlots}
-        />
+        <RestaurantFormItem item={timeslots} name="Timeslots" checkState={[]} />
       </div>
     </div>
   );
