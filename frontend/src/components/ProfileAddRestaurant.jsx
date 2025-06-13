@@ -10,7 +10,8 @@ import RestaurantFormOperatingHoursView from "./RestaurantFormOperatingHoursView
 import Loading from "./Loading";
 
 function ProfileAddRestaurant() {
-  const { addRestaurantData, handleSaveAddRestaurantItem } = useProfileData();
+  const { openModal, addRestaurantData, handleSaveAddRestaurantItem } =
+    useProfileData();
   const { basicInformation, tableInformation, operatingHoursInformation } =
     addRestaurantData;
 
@@ -63,6 +64,16 @@ function ProfileAddRestaurant() {
   //   }
   // }
 
+  useEffect(
+    function () {
+      if (formView === "tableInfo") {
+        setFormView("overall");
+        openModal("EDIT_TABLE_DATA", null);
+      }
+    },
+    [formView, openModal]
+  );
+
   function handleFormChange(newView) {
     setFormView(newView);
   }
@@ -73,15 +84,6 @@ function ProfileAddRestaurant() {
         return (
           <RestaurantFormBasicView
             basicInformation={addRestaurantData.basicInformation}
-            onSave={handleSaveAddRestaurantItem}
-            onReturn={() => setFormView("overall")}
-          />
-        );
-
-      case "tableInfo":
-        return (
-          <RestaurantFormTableView
-            tableInformation={addRestaurantData.tableInformation}
             onSave={handleSaveAddRestaurantItem}
             onReturn={() => setFormView("overall")}
           />

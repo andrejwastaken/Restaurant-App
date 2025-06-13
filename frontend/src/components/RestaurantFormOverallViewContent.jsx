@@ -7,7 +7,6 @@ function RestaurantFormOverallViewContent({
   tableSizes,
   address,
   phone_number,
-  smokingTables,
   timeslots,
   onClick,
 }) {

@@ -12,6 +12,8 @@ import ProfileEditUsername from "../../components/ProfileEditUsername";
 import ProfileEditEmail from "../../components/ProfileEditEmail";
 import ProfileEditPhoneNumber from "../../components/ProfileEditPhoneNumber";
 import ProfileEditPassword from "../../components/ProfileEditPassword";
+import ModalCanvasShell from "../../components/ModalCanvasShell";
+import RestaurantFormTableConfiguration from "../../components/RestaurantFormTableConfiguration";
 
 const MODAL_CONFIG = {
   EDIT_USERNAME: {
@@ -30,6 +32,9 @@ const MODAL_CONFIG = {
     Component: ProfileEditPassword,
     title: "Change Password",
   },
+  EDIT_TABLE_DATA: {
+    title: "Change table",
+  },
 };
 
 const ProfilePage = () => {
@@ -45,7 +50,8 @@ const ProfilePage = () => {
       address: "",
       phone_number: "",
     },
-    tableInformation: [],
+    tableTypesInformation: [],
+    tablesInformation: [],
     operatingHoursInformation: [],
   });
 
@@ -171,14 +177,19 @@ const ProfilePage = () => {
         )}
         <Footer />
 
-        {CurrentModal && (
-          <ModalShell title={CurrentModal.title} onClose={closeModal}>
-            <CurrentModal.Component
-              initialData={initialDataForModal}
-              onSubmit={handleSave}
-            />
-          </ModalShell>
-        )}
+        {CurrentModal &&
+          (CurrentModal.title.includes("table") ? (
+            <ModalCanvasShell onClose={closeModal}>
+              <RestaurantFormTableConfiguration />
+            </ModalCanvasShell>
+          ) : (
+            <ModalShell title={CurrentModal.title} onClose={closeModal}>
+              <CurrentModal.Component
+                initialData={initialDataForModal}
+                onSubmit={handleSave}
+              />
+            </ModalShell>
+          ))}
       </div>
     </ProfileDataContext.Provider>
   );
