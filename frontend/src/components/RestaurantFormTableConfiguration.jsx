@@ -84,29 +84,72 @@ function RestaurantFormTableConfiguration() {
 
   const handleTableSelect = (pos, eventType) => {
     if (eventType === "down") {
-      if (pendingTable && !isDragging) return;
+      // MORA DA IMA TABLETYPE PRED TABLE DA STAVA
+      if (!tableTypesInformation || tableTypesInformation.length === 0) {
+        toast.error(
+          "Table type must be made before making the table configuration!"
+        );
+        return;
+      }
 
-      const clickedTable = tablesInformation.find((table) => {
+      let clickedTable = null;
+
+      // First, check if the click is on the current pending table
+      if (pendingTable) {
+        const table = pendingTable;
         if (table.shape === "circle") {
           const distance = Math.sqrt(
             (pos.x - table.x) ** 2 + (pos.y - table.y) ** 2
           );
-          return distance < table.radius;
+          if (distance < table.radius) clickedTable = table;
+        } else {
+          if (
+            pos.x >= table.x &&
+            pos.x <= table.x + table.width &&
+            pos.y >= table.y &&
+            pos.y <= table.y + table.height
+          ) {
+            clickedTable = table;
+          }
         }
-        return (
-          pos.x >= table.x &&
-          pos.x <= table.x + table.width &&
-          pos.y >= table.y &&
-          pos.y <= table.y + table.height
-        );
-      });
+      }
+
+      // If not clicking the pending table, check saved tables
+      if (!clickedTable) {
+        clickedTable = tablesInformation.find((table) => {
+          if (table.shape === "circle") {
+            const distance = Math.sqrt(
+              (pos.x - table.x) ** 2 + (pos.y - table.y) ** 2
+            );
+            return distance < table.radius;
+          }
+          return (
+            pos.x >= table.x &&
+            pos.x <= table.x + table.width &&
+            pos.y >= table.y &&
+            pos.y <= table.y + table.height
+          );
+        });
+      }
 
       if (clickedTable) {
+        // If we clicked on a table that is *not* the current pending one, switch to it.
+        if (!pendingTable || pendingTable.id !== clickedTable.id) {
+          if (pendingTable) {
+            toast.error(
+              "Save or cancel the current table before editing another.",
+              { id: "finish-edit-toast" }
+            );
+            return;
+          }
+          setPendingTable({ ...clickedTable, isPending: true });
+        }
         setIsDragging(true);
-        setPendingTable({ ...clickedTable, isPending: true });
         setDragOffset({ x: pos.x - clickedTable.x, y: pos.y - clickedTable.y });
       } else {
-        if (pendingTable) return;
+        if (pendingTable) return; // Clicked blank space while a table is pending, do nothing.
+
+        // Clicked on blank space, create a new table
         const newTable = {
           id: `pending-${Date.now()}`,
           name: "",
@@ -156,13 +199,35 @@ function RestaurantFormTableConfiguration() {
 
   const handleSave = () => {
     if (!pendingTable) return;
-    const { isPending, ...tableToSave } = pendingTable;
 
+    if (!pendingTable.name || pendingTable.name.trim() === "") {
+      toast.error("A table must have a name.");
+      return;
+    }
+
+    const nameExists = tablesInformation.some(
+      (table) =>
+        table.name.toLowerCase() === pendingTable.name.toLowerCase() &&
+        table.id !== pendingTable.id
+    );
+
+    if (nameExists) {
+      toast.error(
+        "A table with this name already exists. Please choose a different name."
+      );
+      return;
+    }
+
+    if (!pendingTable.table_type || pendingTable.table_type.trim() === "") {
+      toast.error("A table must have a type selected.");
+      return;
+    }
+
+    const { isPending, ...tableToSave } = pendingTable;
     const existingIndex = tablesInformation.findIndex(
       (t) => t.id === tableToSave.id
     );
     let newTables;
-
     if (existingIndex > -1) {
       newTables = [...tablesInformation];
       newTables[existingIndex] = tableToSave;
@@ -172,14 +237,25 @@ function RestaurantFormTableConfiguration() {
         { ...tableToSave, id: `table-${Date.now()}` },
       ];
     }
+
     handleSaveAddRestaurantItem({ tablesInformation: newTables });
     setPendingTable(null);
     toast.success("Table saved!");
   };
 
+  const handleDelete = () => {
+    if (!pendingTable || pendingTable.id.toString().startsWith("pending-"))
+      return;
+    const newTables = tablesInformation.filter((t) => t.id !== pendingTable.id);
+    handleSaveAddRestaurantItem({ tablesInformation: newTables });
+    setPendingTable(null);
+    toast.success("Table deleted.");
+  };
+
   const handleReturn = () => {
     setPendingTable(null);
     setIsDragging(false);
+    setIsAddingTableType(false);
   };
 
   const handleAddTableTypeClick = () => {
@@ -244,6 +320,7 @@ function RestaurantFormTableConfiguration() {
             tableData={pendingTable}
             tableTypes={tableTypesInformation}
             onDataChange={handlePendingDataChange}
+            onDelete={handleDelete}
             onSave={handleSave}
             onReturn={handleReturn}
           />

@@ -6,13 +6,21 @@ function RestaurantFormTableSetup({
   tableData,
   tableTypes,
   onDataChange,
+  onDelete,
   onSave,
   onReturn,
 }) {
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value, type, checked } = e.target;
 
-    onDataChange(name, type === "number" ? parseFloat(value) || 0 : value);
+    const newValue =
+      type === "checkbox"
+        ? checked
+        : type === "number"
+        ? parseFloat(value) || 0
+        : value;
+
+    onDataChange(name, newValue);
   };
 
   const handleShapeChange = (e) => {
@@ -20,6 +28,8 @@ function RestaurantFormTableSetup({
   };
 
   if (!tableData) return null;
+
+  const isNewTable = tableData.id.toString().startsWith("pending-");
 
   return (
     <div className="flex flex-col justify-between h-full w-full border-2 border-gray-300 rounded-md shadow-sm bg-white p-4 transition-opacity duration-300 ease-in-out">
@@ -131,6 +141,30 @@ function RestaurantFormTableSetup({
               onChange={handleChange}
             />
           )}
+
+          <div className="flex items-center space-x-3 pt-2">
+            <input
+              name="isSmoking"
+              type="checkbox"
+              checked={tableData.isSmoking}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+            />
+            <label
+              htmlFor="isSmoking"
+              className="text-sm font-medium text-gray-700"
+            >
+              Smoking table
+            </label>
+          </div>
+
+          <button
+            type="button"
+            onClick={onDelete}
+            className="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          >
+            Delete
+          </button>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
