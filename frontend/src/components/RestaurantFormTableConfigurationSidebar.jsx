@@ -12,19 +12,19 @@ function RestaurantFormTableConfigurationSidebar({
   }
 
   return (
-    <div className="flex flex-col justify-between h-full w-full border-2 border-gray-300 rounded-md shadow-sm bg-white p-4">
-      <div className="flex-grow h-full flex flex-col">
+    <div className="flex flex-col justify-between h-full w-full border-2 border-gray-300 rounded-md shadow-sm bg-white p-4 transition-opacity duration-300 ease-in-out">
+      <div className="flex flex-col h-full min-h-0">
         <h4 className="text-md font-semibold text-gray-800">
           Table Types Configuration
         </h4>
-        {Array(tableTypes).length === 0 ? (
+        {tableTypes.length === 0 ? (
           <div className="flex-grow flex justify-center items-center">
             <h4 className="text-md font-semibold text-gray-800">
               Oops... Nothing here.
             </h4>
           </div>
         ) : (
-          <ul className="mt-10 mb-10 max-h-[330px] overflow-y-auto space-y-4">
+          <ul className="flex-1 min-h-0 overflow-y-auto mt-10 mb-10 space-y-4">
             {tableTypes.map((tableType, index) => (
               <RestaurantFormTableTypeData
                 index={index}

@@ -5,15 +5,18 @@ import { toast } from "react-hot-toast";
 import api from "../api/api";
 import RestaurantFormOverallView from "./RestaurantFormOverallView";
 import RestaurantFormBasicView from "./RestaurantFormBasicView";
-import RestaurantFormTableView from "./RestaurantFormTableView";
 import RestaurantFormOperatingHoursView from "./RestaurantFormOperatingHoursView";
 import Loading from "./Loading";
 
 function ProfileAddRestaurant() {
   const { openModal, addRestaurantData, handleSaveAddRestaurantItem } =
     useProfileData();
-  const { basicInformation, tableInformation, operatingHoursInformation } =
-    addRestaurantData;
+  const {
+    basicInformation,
+    tableTypesInformation,
+    tablesInformation,
+    operatingHoursInformation,
+  } = addRestaurantData;
 
   const [formView, setFormView] = useState("overall");
   const [isLoading, setIsLoading] = useState(false);
@@ -92,9 +95,7 @@ function ProfileAddRestaurant() {
       case "operatingHours":
         return (
           <RestaurantFormOperatingHoursView
-            operatingHoursInformation={
-              addRestaurantData.operatingHoursInformation
-            }
+            operatingHoursInformation={operatingHoursInformation}
             onSave={handleSaveAddRestaurantItem}
             onReturn={() => setFormView("overall")}
           />
@@ -104,9 +105,9 @@ function ProfileAddRestaurant() {
       default:
         return (
           <RestaurantFormOverallView
-            basicInformation={addRestaurantData.basicInformation}
-            tableSizes={addRestaurantData.tableInformation}
-            operatingHours={addRestaurantData.operatingHoursInformation}
+            basicInformation={basicInformation}
+            tablesInformation={tablesInformation}
+            operatingHours={operatingHoursInformation}
             onClick={handleFormChange}
             onSubmit={() => {}}
           />

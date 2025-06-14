@@ -4,10 +4,11 @@ import RestaurantFormItem from "./RestaurantFormItem";
 function RestaurantFormOverallViewContent({
   name,
   description,
-  tableSizes,
+  tableTypes,
+  tables,
   address,
   phone_number,
-  timeslots,
+  operatingHours,
   onClick,
 }) {
   return (
@@ -38,8 +39,8 @@ function RestaurantFormOverallViewContent({
 
       <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200 space-y-2 mb-6">
         <RestaurantFormItem
-          item={tableSizes}
-          name="Table sizes"
+          item={tables}
+          name="Tables configuration"
           checkState={[]}
         />
       </div>
@@ -50,7 +51,11 @@ function RestaurantFormOverallViewContent({
       />
 
       <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200 space-y-2 mb-6">
-        <RestaurantFormItem item={timeslots} name="Timeslots" checkState={[]} />
+        <RestaurantFormItem
+          item={operatingHours}
+          name="Timeslots"
+          checkState={[]}
+        />
       </div>
     </div>
   );

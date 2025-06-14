@@ -11,40 +11,45 @@ function RestaurantFormTableConfigurationCanvas({
   tables,
   onTableMove,
   onTableSelect,
+  onResize,
 }) {
   const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!entries || entries.length === 0) return;
+      const { width, height } = entries[0].contentRect;
+      // Only call onResize if the size has actually changed to avoid infinite loops
+      if (canvas.width !== width || canvas.height !== height) {
+        onResize({ width, height });
+      }
+    });
+    resizeObserver.observe(canvas);
+    return () => resizeObserver.unobserve(canvas);
+  }, [onResize]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
-    const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
     context.clearRect(0, 0, canvas.width, canvas.height);
-
     (tables || []).forEach((table) => {
       const isPending = table.isPending;
       context.fillStyle = isPending ? "rgba(59, 130, 246, 0.5)" : "#F0F0F0";
       context.strokeStyle = isPending ? "rgb(37, 99, 235)" : "black";
       context.lineWidth = isPending ? 2 : 1;
-
       if (table.shape === "circle") {
         context.beginPath();
         context.arc(table.x, table.y, table.radius, 0, 2 * Math.PI);
         context.fill();
         context.stroke();
       } else {
-        // rectangle
         context.fillRect(table.x, table.y, table.width, table.height);
         context.strokeRect(table.x, table.y, table.width, table.height);
       }
     });
-
-    return () => window.removeEventListener("resize", resizeCanvas);
   }, [tables]);
 
   const getMousePos = (event) => {

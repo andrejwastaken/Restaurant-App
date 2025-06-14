@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import RestaurantFormTableConfigurationCanvas from "./RestaurantFormTableConfigurationCanvas";
 import RestaurantFormTableConfigurationSidebar from "./RestaurantFormTableConfigurationSidebar";
@@ -81,6 +81,43 @@ function RestaurantFormTableConfiguration() {
   const [pendingTable, setPendingTable] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  const canvasSizeRef = useRef({ width: 0, height: 0 });
+
+  const handleCanvasResize = ({ width, height }) => {
+    const oldSize = canvasSizeRef.current;
+    if (
+      oldSize.width === 0 ||
+      (oldSize.width === width && oldSize.height === height)
+    ) {
+      canvasSizeRef.current = { width, height };
+      return;
+    }
+    const scaleX = width / oldSize.width;
+    const scaleY = height / oldSize.height;
+
+    const scaleTable = (table) => ({
+      ...table,
+      x: table.x * scaleX,
+      y: table.y * scaleY,
+      width: table.shape === "rectangle" ? table.width * scaleX : table.width,
+      height:
+        table.shape === "rectangle" ? table.height * scaleY : table.height,
+      radius:
+        table.shape === "circle"
+          ? table.radius * ((scaleX + scaleY) / 2)
+          : table.radius,
+    });
+
+    const scaledTables = tablesInformation.map(scaleTable);
+    handleSaveAddRestaurantItem({ tablesInformation: scaledTables });
+
+    if (pendingTable) {
+      setPendingTable(scaleTable(pendingTable));
+    }
+
+    canvasSizeRef.current = { width, height };
+  };
 
   const handleTableSelect = (pos, eventType) => {
     if (eventType === "down") {
@@ -285,6 +322,7 @@ function RestaurantFormTableConfiguration() {
     handleSaveAddRestaurantItem({ tableTypesInformation: updatedTableTypes });
 
     toast.success("Table type successfully added");
+    console.log(updatedTableTypes);
     setIsAddingTableType(false);
   };
 
@@ -306,10 +344,11 @@ function RestaurantFormTableConfiguration() {
           tables={tablesOnCanvas}
           onTableSelect={handleTableSelect}
           onTableMove={handleTableMove}
+          onResize={handleCanvasResize}
         />
       </div>
 
-      <div className="w-1/4 h-full">
+      <div className="w-1/4 h-full min-h-0 flex flex-col">
         {isAddingTableType ? (
           <RestaurantFormTableConfigurationSidebarTableType
             onReturn={handleReturn}

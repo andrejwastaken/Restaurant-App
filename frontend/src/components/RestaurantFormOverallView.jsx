@@ -3,7 +3,7 @@ import RestaurantFormOverallViewContent from "./RestaurantFormOverallViewContent
 
 function RestaurantFormOverallView({
   basicInformation,
-  tableSizes,
+  tablesInformation,
   operatingHours,
   onClick,
   onSubmit,
@@ -18,8 +18,8 @@ function RestaurantFormOverallView({
           description={basicInformation.description}
           address={basicInformation.address}
           phone_number={basicInformation.phone_number}
-          tableSizes={tableSizes}
-          timeslots={operatingHours}
+          tables={tablesInformation}
+          operatingHours={operatingHours}
           onClick={onClick}
         />
       </div>

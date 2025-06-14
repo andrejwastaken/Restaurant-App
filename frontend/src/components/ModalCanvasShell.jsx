@@ -50,7 +50,7 @@ function ModalCanvasShell({ children, onClose }) {
           </button>
         </div>
 
-        <div className="flex-grow p-4 overflow-hidden">{children}</div>
+        <div className="flex-grow p-4 overflow-hidden h-full">{children}</div>
       </div>
     </div>
   );
