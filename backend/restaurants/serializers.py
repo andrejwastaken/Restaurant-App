@@ -14,11 +14,6 @@ class RestaurantSetupNestedSerializer(serializers.ModelSerializer):
         model = RestaurantSetup
         fields = ['default_slot_duration']
 
-class TableTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TableType
-        fields = ['id', 'name' ,'capacity']
-
 class TableTypeNestedCreateSerializer(serializers.ModelSerializer):
     """A simple serializer for the nested list of table types."""
     class Meta:
@@ -95,15 +90,6 @@ class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):
             'operating_hours'
         ]
 
-    def validate_operating_hours(self, data):
-        days_seen = set()
-        for day in data:
-            current_day = data.get('day_of_week')
-            if current_day in days_seen:
-                raise serializers.ValidationError("Please make sure you add each day only once")
-            days_seen.add(current_day)
-        return data
-
     @transaction.atomic # Ensure all database operations succeed or none do.
     def create(self, validated_data):
         # 1. Separate the nested table type data from the main restaurant data.
@@ -126,4 +112,47 @@ class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):
             OperationHours.objects.create(setup=setup, **operating_hour_data)
 
         return restaurant
+
+
+class TableBulkCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer to handle the bulk creation of tables from a list of data.
+    """
+    # We accept the name of the table type from the frontend.
+    table_type_name = serializers.CharField(write_only=True, source='table_type')
+
+    class Meta:
+        model = Table
+        fields = [
+            'name',
+            'table_type_name',  # Input field
+            'table_type',  # Output/internal field
+            'is_smoking',
+            'x_position',
+            'y_position',
+            'width',
+            'height',
+            'radius',
+            'shape'
+        ]
+        # table_type is now read_only because we handle it manually.
+        read_only_fields = ['id', 'table_type']
+
+    def validate_table_type_name(self, value):
+        """
+        Validate that the provided table_type_name exists for the current setup.
+        """
+        # The view will pass the 'setup' object into the serializer's context.
+        setup = self.context.get('setup')
+
+        try:
+            # Check if a TableType with this name exists for this specific setup.
+            table_type = TableType.objects.get(setup=setup, name=value)
+        except TableType.DoesNotExist:
+            raise serializers.ValidationError(
+                f"A table type with the name '{value}' does not exist for this restaurant."
+            )
+
+        # Return the actual TableType object, not just its name.
+        return table_type
 

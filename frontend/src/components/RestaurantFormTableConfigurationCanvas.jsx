@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-const initialEmptyTable = {
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0,
-};
-
 function RestaurantFormTableConfigurationCanvas({
   tables,
   onTableMove,

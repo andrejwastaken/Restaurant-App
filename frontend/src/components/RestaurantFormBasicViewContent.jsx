@@ -3,6 +3,7 @@ function RestaurantFormBasicViewContent({
   description,
   address,
   phone_number,
+  default_reservation_slot_duration,
   onChange,
 }) {
   return (
@@ -58,6 +59,20 @@ function RestaurantFormBasicViewContent({
           placeholder="Description"
           value={description}
           onChange={onChange}
+          className="w-full border p-2 mb-4 rounded"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Minimum reservation timeslot
+        </label>
+        <input
+          name="default_reservation_slot_duration"
+          type="number"
+          value={default_reservation_slot_duration}
+          onChange={onChange}
+          placeholder="ex. 60min"
           className="w-full border p-2 mb-4 rounded"
         />
       </div>

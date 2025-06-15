@@ -29,6 +29,8 @@ function RestaurantFormTableSetup({
 
   if (!tableData) return null;
 
+  const isNewTable = tableData.id.toString().startsWith("pending-");
+
   return (
     <div className="flex flex-col justify-between h-full w-full border-2 border-gray-300 rounded-md shadow-sm bg-white p-4 transition-opacity duration-300 ease-in-out">
       <div className="flex flex-col h-full min-h-0">
@@ -39,7 +41,7 @@ function RestaurantFormTableSetup({
             label="Table name"
             type="text"
             name="name"
-            initialValue={tableData.name}
+            value={tableData.name}
             onChange={handleChange}
           />
 
@@ -118,7 +120,7 @@ function RestaurantFormTableSetup({
                 label="Table width"
                 type="number"
                 name="width"
-                initialValue={tableData.width}
+                value={tableData.width}
                 onChange={handleChange}
               />
 
@@ -126,7 +128,7 @@ function RestaurantFormTableSetup({
                 label="Table height"
                 type="number"
                 name="height"
-                initialValue={tableData.height}
+                value={tableData.height}
                 onChange={handleChange}
               />
             </>
@@ -135,7 +137,7 @@ function RestaurantFormTableSetup({
               label="Table radius"
               type="number"
               name="radius"
-              initialValue={tableData.radius}
+              value={tableData.radius}
               onChange={handleChange}
             />
           )}

@@ -49,6 +49,7 @@ const ProfilePage = () => {
       description: "",
       address: "",
       phone_number: "",
+      default_reservation_slot_duration: "",
     },
     tableTypesInformation: [],
     tablesInformation: [],

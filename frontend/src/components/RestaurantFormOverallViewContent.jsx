@@ -4,13 +4,21 @@ import RestaurantFormItem from "./RestaurantFormItem";
 function RestaurantFormOverallViewContent({
   name,
   description,
-  tableTypes,
   tables,
   address,
   phone_number,
+  default_reservation_slot_duration,
   operatingHours,
   onClick,
 }) {
+  const basicInformation = {
+    name: name,
+    description: description,
+    address: address,
+    phone_number: phone_number,
+    default_reservation_slot_duration: default_reservation_slot_duration,
+  };
+
   return (
     <div className="w-full h-full mt-10 overflow-true">
       <RestaurantFormEditor
@@ -18,17 +26,10 @@ function RestaurantFormOverallViewContent({
         handleClick={() => onClick("basicInfo")}
       />
       <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200 space-y-2 mb-6">
-        <RestaurantFormItem item={name} name="Name" checkState="" />
         <RestaurantFormItem
-          item={description}
-          name="Description"
-          checkState=""
-        />
-        <RestaurantFormItem item={address} name="Address" checkState="" />
-        <RestaurantFormItem
-          item={phone_number}
-          name="Phone Number"
-          checkState=""
+          item={basicInformation}
+          name="Basic information configuration"
+          checkState={{}}
         />
       </div>
 
@@ -53,7 +54,7 @@ function RestaurantFormOverallViewContent({
       <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200 space-y-2 mb-6">
         <RestaurantFormItem
           item={operatingHours}
-          name="Timeslots"
+          name="Timeslots configuration"
           checkState={[]}
         />
       </div>

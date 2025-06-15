@@ -11,12 +11,17 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
           name: "",
           description: "",
           address: "",
-          phone_number: ""
+          phone_number: "",
+          default_reservation_slot_duration: "",
         }
   );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "default_reservation_slot_duration" && value < 0) {
+      return;
+    }
 
     setCurrentBasicInformation((prevInfo) => ({
       ...prevInfo,
@@ -38,6 +43,9 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
           description={currentBasicInformation.description}
           address={currentBasicInformation.address}
           phone_number={currentBasicInformation.phone_number}
+          default_reservation_slot_duration={
+            currentBasicInformation.default_reservation_slot_duration
+          }
           onChange={handleChange}
         />
       </div>

@@ -90,7 +90,7 @@ function RestaurantFormTableConfiguration() {
       oldSize.width === 0 ||
       (oldSize.width === width && oldSize.height === height)
     ) {
-      canvasSizeRef.current = { width, height };
+      //canvasSizeRef.current = { width, height };
       return;
     }
     const scaleX = width / oldSize.width;
@@ -322,7 +322,6 @@ function RestaurantFormTableConfiguration() {
     handleSaveAddRestaurantItem({ tableTypesInformation: updatedTableTypes });
 
     toast.success("Table type successfully added");
-    console.log(updatedTableTypes);
     setIsAddingTableType(false);
   };
 

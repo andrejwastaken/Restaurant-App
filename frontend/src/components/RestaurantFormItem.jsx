@@ -14,15 +14,15 @@ function RestaurantFormItem({ item, name, checkState }) {
       }
 
       if (typeof item === "object") {
-        const allEmpty = Object.values(item).every(
-          (val) => Array.isArray(val) && val.length === 0
-        );
+        const allEmpty = Object.values(item).every((val) => val === "");
 
         if (allEmpty) {
           return <span className="italic text-gray-400">Empty</span>;
         }
 
-        return <span className="italic text-gray-500">Time slots filled</span>;
+        return (
+          <span className="italic text-gray-500">Configuration filled</span>
+        );
       }
 
       return <span className="italic text-gray-500">{item}</span>;

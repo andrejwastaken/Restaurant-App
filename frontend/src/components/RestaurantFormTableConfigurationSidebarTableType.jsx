@@ -51,7 +51,7 @@ function RestaurantFormTableConfigurationSidebarTableType({
             label="Table type name"
             type="text"
             name="name"
-            initialValue={tableType.name}
+            value={tableType.name}
             onChange={handleChange}
           />
 
@@ -59,7 +59,7 @@ function RestaurantFormTableConfigurationSidebarTableType({
             label="Table type capacity"
             type="number"
             name="capacity"
-            initialValue={tableType.capacity}
+            value={tableType.capacity}
             onChange={handleChange}
           />
         </div>

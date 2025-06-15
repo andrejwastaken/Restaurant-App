@@ -27,6 +27,7 @@ function RestaurantFormTableConfigurationSidebar({
           <ul className="flex-1 min-h-0 overflow-y-auto mt-10 mb-10 space-y-4">
             {tableTypes.map((tableType, index) => (
               <RestaurantFormTableTypeData
+                key={index}
                 index={index}
                 name={tableType.name}
                 capacity={tableType.capacity}

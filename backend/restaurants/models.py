@@ -85,10 +85,11 @@ class Table(models.Model):
     )
 
     #CANVAS POSITIONING LOGIC
-    x_position = models.PositiveIntegerField()
-    y_position = models.PositiveIntegerField()
+    x_position = models.FloatField()
+    y_position = models.FloatField()
     width = models.PositiveIntegerField()
     height = models.PositiveIntegerField()
+    radius = models.PositiveIntegerField()
     shape = models.CharField(
         max_length = 10,
         choices=SHAPE_CHOICES,

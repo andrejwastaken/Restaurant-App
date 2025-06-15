@@ -2,8 +2,8 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Restaurant, RestaurantSetup, TableType
-from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer
+from .models import Restaurant, RestaurantSetup, TableType, Table
+from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer
 from datetime import datetime
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
@@ -34,6 +34,44 @@ class CreateRestaurantView(APIView):
             restaurant = serializer.save()
 
             return Response({"message": "Restaurant created successfully", 'id': restaurant.id}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SetupRestaurantTablesView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, restaurant_id):
+        try:
+            restaurant = Restaurant.objects.get(pk=restaurant_id, owner=self.request.user)
+            return restaurant.setup
+        except Restaurant.DoesNotExist:
+            return None
+
+    def post(self, request, restaurant_id, *args, **kwargs):
+        setup = self.get_object(restaurant_id)
+
+        if not setup:
+            return Response(
+                {"detail": "Restaurant not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = TableBulkCreateSerializer(
+            data = request.data,
+            context = {'setup': setup},
+            many = True
+        )
+
+        if serializer.is_valid():
+            # The serializer validation already transformed 'table_type_name' into an object.
+            # We can now save it directly.
+            tables_to_create = []
+            for table_data in serializer.validated_data:
+                tables_to_create.append(Table(setup=setup, **table_data))
+
+            Table.objects.bulk_create(tables_to_create)
+
+            return Response({"message": "Floor plan saved successfully."}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

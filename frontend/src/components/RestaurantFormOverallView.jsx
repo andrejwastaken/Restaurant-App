@@ -18,6 +18,9 @@ function RestaurantFormOverallView({
           description={basicInformation.description}
           address={basicInformation.address}
           phone_number={basicInformation.phone_number}
+          default_reservation_slot_duration={
+            basicInformation.default_reservation_slot_duration
+          }
           tables={tablesInformation}
           operatingHours={operatingHours}
           onClick={onClick}
