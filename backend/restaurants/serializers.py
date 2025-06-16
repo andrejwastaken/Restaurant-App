@@ -90,6 +90,11 @@ class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):
             'operating_hours'
         ]
 
+    def validate_name(self, value):
+        if Restaurant.objects.filter(name__iexact=value).exists():
+            raise serializers.ValidationError("A restaurant with that name already exists!")
+        return value
+
     @transaction.atomic # Ensure all database operations succeed or none do.
     def create(self, validated_data):
         # 1. Separate the nested table type data from the main restaurant data.
@@ -155,4 +160,53 @@ class TableBulkCreateSerializer(serializers.ModelSerializer):
 
         # Return the actual TableType object, not just its name.
         return table_type
+
+# API CALLING SERIALIZERS
+class TableTypeDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TableType
+        # These are the fields the owner will provide for each type of table they add.
+        fields = ['id', 'name', 'capacity']
+
+class TableDetailSerializer(serializers.ModelSerializer):
+    """READ-ONLY serializer for displaying individual tables."""
+    # Fetches the 'name' field from the related table_type object for display.
+    table_type = serializers.CharField(source='table_type.name', read_only=True)
+
+    class Meta:
+        model = Table
+        fields = [
+            'id',
+            'name',
+            'table_type',
+            'is_smoking',
+            'shape',
+            'x_position',
+            'y_position',
+            'width',
+            'height',
+            'radius'
+        ]
+
+class OperatingHoursDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OperationHours
+        fields = ['id', 'day_of_week', 'open_time', 'close_time']
+
+class RestaurantSetupDetailSerializer(serializers.ModelSerializer):
+    """Nests all the setup-related details together for a comprehensive view."""
+    operating_hours = OperatingHoursDetailSerializer(many=True, read_only=True)
+    table_types = TableTypeDetailSerializer(many=True, read_only=True)
+    tables = TableDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = RestaurantSetup
+        fields = ['default_slot_duration', 'operating_hours', 'table_types', 'tables']
+
+class OwnedRestaurantDetailSerializer(serializers.ModelSerializer):
+    setup = RestaurantSetupDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Restaurant
+        fields = ['id', 'name', 'description', 'address', 'phone_number', 'is_validated', 'setup']
 

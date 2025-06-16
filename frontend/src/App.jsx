@@ -12,11 +12,14 @@ import Register from "./pages/LoginRegisterPages/Register";
 import Login from "./pages/LoginRegisterPages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/UserManagementPages/ProfilePage";
-import AddRestaurant from "./pages/UserManagementPages/AddRestaurant";
 import ProfilePersonalInfo from "./components/ProfilePersonalInfo";
 import ProfileReservationHistory from "./components/ProfileReservationHistory";
 import ProfileFavouriteRestaurants from "./components/ProfileFavouriteRestaurants";
 import ProfileOwnedRestaurants from "./components/ProfileOwnedRestaurants";
+import ProfileOwnedRestaurantView from "./components/ProfileOwnedRestaurantView";
+import ProfileOwnedRestaurantViewReservations from "./components/ProfileOwnedRestaurantViewReservations";
+import ProfileOwnedRestaurantViewSpecialDays from "./components/ProfileOwnedRestaurantViewSpecialDays";
+import ProfileOwnedRestaurantViewEditRestaurant from "./components/ProfileOwnedRestaurantViewEditRestaurant";
 import ProfileAddRestaurant from "./components/ProfileAddRestaurant";
 import RestaurantDetailPage from './pages/RestaurantDetailPage';
 
@@ -68,20 +71,36 @@ const router = createBrowserRouter([
       {
         path: "owned-restaurants",
         element: <ProfileOwnedRestaurants />,
+        children: [
+          {
+            path: ":restaurantId",
+            element: <ProfileOwnedRestaurantView />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="reservations" replace />,
+              },
+              {
+                path: "reservations",
+                element: <ProfileOwnedRestaurantViewReservations />,
+              },
+              {
+                path: "special-days",
+                element: <ProfileOwnedRestaurantViewSpecialDays />,
+              },
+              {
+                path: "edit-restaurant",
+                element: <ProfileOwnedRestaurantViewEditRestaurant />,
+              },
+            ],
+          },
+        ],
       },
       {
         path: "add-restaurant",
         element: <ProfileAddRestaurant />,
       },
     ],
-  },
-  {
-    path: "/manage-restaurants",
-    element: (
-      <ProtectedRoute>
-        <AddRestaurant />
-      </ProtectedRoute>
-    ),
   },
 ]);
 

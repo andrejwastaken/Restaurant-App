@@ -32,6 +32,7 @@ function RestaurantFormOperatingHoursView({
           <RestaurantFormOperatingHoursViewContent
             operatingHours={currentOperatingHours}
             onChangeOperatingHours={handleOperatingHoursChange}
+            scrollHeight={450}
           />
         </div>
       </div>

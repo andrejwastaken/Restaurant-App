@@ -90,7 +90,6 @@ function RestaurantFormTableConfiguration() {
       oldSize.width === 0 ||
       (oldSize.width === width && oldSize.height === height)
     ) {
-      //canvasSizeRef.current = { width, height };
       return;
     }
     const scaleX = width / oldSize.width;

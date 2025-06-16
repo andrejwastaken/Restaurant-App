@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
+import { useParams, Outlet } from "react-router-dom";
 
 import api from "../api/api";
-import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
+import RestaurantUpdateContext from "../contexts/RestaurantUpdateContext";
+import Loading from "./Loading";
+import ProfileOwnedRestaurantsList from "./ProfileOwnedRestaurantsList";
 
 function ProfileOwnedRestaurants() {
   const [restaurants, setRestaurants] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { restaurantId } = useParams();
 
   useEffect(function () {
     const fetchRestaurants = async () => {
@@ -12,19 +18,27 @@ function ProfileOwnedRestaurants() {
         const response = await api.get("/api/owned-restaurants/");
         if (response.status === 200) {
           setRestaurants(response.data);
-          console.log(response.data);
         }
       } catch (error) {
         console.error("Failed to fetch user restaurants: ", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
+    setIsLoading(true);
     fetchRestaurants();
   }, []);
 
   return (
-    <div className="w-full h-full p-6">
-      <ProfileMenuContentTitle label="Owned Restaurants" />
+    <div className="w-full h-full p-6 flex flex-col">
+      {isLoading ? (
+        <Loading>Loading your restaurants...</Loading>
+      ) : restaurantId ? (
+        <Outlet />
+      ) : (
+        <ProfileOwnedRestaurantsList restaurants={restaurants} />
+      )}
     </div>
   );
 }

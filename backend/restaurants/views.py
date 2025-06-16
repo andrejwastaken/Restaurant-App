@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Restaurant, RestaurantSetup, TableType, Table
-from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer
+from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer, \
+    OwnedRestaurantDetailSerializer
 from datetime import datetime
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
@@ -11,6 +12,8 @@ from geopy.geocoders import Nominatim
 
 
 class RestaurantListDetailAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, pk=None):
         if pk:
             try:
@@ -122,8 +125,25 @@ class OwnedRestaurantsListView(APIView):
 
     def get(self, request):
         restaurants = Restaurant.objects.filter(owner=request.user)
+        restaurants = Restaurant.objects.filter(owner=request.user)
         serializer = RestaurantSerializer(restaurants, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class OwnedRestaurantDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, restaurant_id):
+        restaurant = Restaurant.objects.get(pk=restaurant_id, owner=request.user)
+
+        if request.user != restaurant.owner:
+            return Response(
+                {"detail": "Not found."},
+                status = status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = OwnedRestaurantDetailSerializer(restaurant)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class GeocodeView(APIView):

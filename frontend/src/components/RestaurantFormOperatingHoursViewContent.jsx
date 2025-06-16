@@ -14,6 +14,7 @@ const daysOfWeek = [
 function RestaurantFormOperatingHoursViewContent({
   operatingHours,
   onChangeOperatingHours,
+  scrollHeight,
 }) {
   // This internal state will track which days are "enabled" or "open"
   const [enabledDays, setEnabledDays] = useState(() => {
@@ -77,7 +78,9 @@ function RestaurantFormOperatingHoursViewContent({
   });
 
   return (
-    <div className="w-full max-h-[450px] mt-6 space-y-3 overflow-y-auto pr-2">
+    <div
+      className={`w-full max-h-[${scrollHeight}px] overflow-y-auto mt-6 space-y-3 pr-2`}
+    >
       {daysOfWeek.map((day) => {
         const dayInfo = operatingHours.find((h) => h.day_of_week === day.key);
         const isOpen = enabledDays[day.key];
@@ -101,7 +104,7 @@ function RestaurantFormOperatingHoursViewContent({
             >
               <select
                 className="border p-2 rounded-md bg-white disabled:bg-gray-200"
-                value={dayInfo?.open_time || "09:00"}
+                value={dayInfo?.open_time?.slice(0, 5) || "09:00"}
                 onChange={(e) =>
                   handleTimeChange(day.key, "open_time", e.target.value)
                 }
