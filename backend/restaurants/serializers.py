@@ -3,11 +3,11 @@ from rest_framework.validators import UniqueValidator
 from django.db import transaction
 from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours
 
-
+        
 class RestaurantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'description', 'is_validated', 'address', 'phone_number']
+        fields = ['id', 'name', 'description', 'is_validated', 'address', 'phone_number', 'latitude', 'longitude']
 
 class RestaurantSetupNestedSerializer(serializers.ModelSerializer):
     class Meta:
@@ -84,7 +84,7 @@ class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
         fields = [
-            'name', 'description', 'address', 'phone_number',
+            'name', 'description', 'address', 'phone_number', 'latitude', 'longitude',
             'setup',
             'table_types', # The nested list of tables
             'operating_hours'

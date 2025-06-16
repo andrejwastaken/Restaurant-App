@@ -15,7 +15,7 @@ export default function RestaurantCard({ restaurant }) {
         <p>{restaurant.description}</p>
         <div className="flex justify-end  mt-2">
           <Link
-            to="/restaurant-details/{restaurant.id}"
+            to={`/restaurant-details/${restaurant.id}`}
             state={{ restaurant }}
             className="mt-2 bg-amber-500 text-white py-1 px-4 rounded hover:bg-amber-600"
           >

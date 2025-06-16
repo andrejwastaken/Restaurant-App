@@ -9,7 +9,7 @@ function RestaurantFormOverallView({
   onSubmit,
 }) {
   return (
-    <div className="w-full h-full p-6 flex flex-col justify-between">
+    <div className="w-full h-screen p-6 flex flex-col justify-between">
       <div>
         <ProfileMenuContentTitle label="Add a Restaurant" />
 

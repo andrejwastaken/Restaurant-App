@@ -7,7 +7,7 @@ function PersonalInfoLabel({ label, content, handleClick }) {
 
       <button
         onClick={handleClick}
-        class="text-[15px] text-blue-500 font-medium focus:outline-none hover:text-blue-700"
+        className="text-[15px] text-blue-500 font-medium focus:outline-none hover:text-blue-700"
       >
         {content}
       </button>

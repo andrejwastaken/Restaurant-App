@@ -7,9 +7,10 @@ from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializ
 from datetime import datetime
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
+from geopy.geocoders import Nominatim
+
 
 class RestaurantListDetailAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
     def get(self, request, pk=None):
         if pk:
             try:
@@ -31,6 +32,7 @@ class CreateRestaurantView(APIView):
         serializer = RestaurantCreateWithSetupSerializer(data=request.data, context = {'request': request})
 
         if serializer.is_valid():
+            print(serializer.validated_data)
             restaurant = serializer.save()
 
             return Response({"message": "Restaurant created successfully", 'id': restaurant.id}, status=status.HTTP_201_CREATED)
@@ -119,10 +121,31 @@ class OwnedRestaurantsListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        restaurants = Restaurant.objects.filter(owner__user=request.user)
+        restaurants = Restaurant.objects.filter(owner=request.user)
         serializer = RestaurantSerializer(restaurants, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class GeocodeView(APIView):
+    def post(self, request, *args, **kwargs):
+        address = request.data.get('address')
+        if not address:
+            return Response({'error': 'Address is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Since your app is only for Skopje, adding it to the query improves results
+        geolocator = Nominatim(user_agent="skopje_restaurant_app")
+        try:
+            location = geolocator.geocode(f"{address}, Skopje, North Macedonia")
+            if location:
+                return Response({
+                    'latitude': location.latitude,
+                    'longitude': location.longitude
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Address not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 # class RestaurantAvailabilityAPIView(APIView):
 #     """
 #     Handles GET requests for a restaurant's real-time availability on a specific date.

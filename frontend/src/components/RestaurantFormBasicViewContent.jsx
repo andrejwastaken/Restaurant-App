@@ -31,7 +31,7 @@ function RestaurantFormBasicViewContent({
           type="text"
           value={address}
           onChange={onChange}
-          placeholder="ul. Primer, br.X/vlez"
+          placeholder="(Булевар) Кирилица/Latinica 42"
           className="w-full border p-2 mb-4 rounded"
         />
       </div>
@@ -45,7 +45,7 @@ function RestaurantFormBasicViewContent({
           type="text"
           value={phone_number}
           onChange={onChange}
-          placeholder="+38X-XX-XXX-XXX"
+          placeholder="+38X XX-XXX-XXX"
           className="w-full border p-2 mb-4 rounded"
         />
       </div>
