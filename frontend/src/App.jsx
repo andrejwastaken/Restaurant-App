@@ -18,6 +18,7 @@ import ProfileReservationHistory from "./components/ProfileReservationHistory";
 import ProfileFavouriteRestaurants from "./components/ProfileFavouriteRestaurants";
 import ProfileOwnedRestaurants from "./components/ProfileOwnedRestaurants";
 import ProfileAddRestaurant from "./components/ProfileAddRestaurant";
+import RestaurantDetailPage from './pages/RestaurantDetailPage';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: "/restaurants",
     element: <RestaurantList />,
+  },
+  {
+    path: "/restaurants/:id",
+    element: <RestaurantDetailPage />,
   },
   {
     path: "/login",

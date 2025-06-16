@@ -61,7 +61,6 @@ function RestaurantList() {
 	const filteredRestaurants = allRestaurants.filter((r) =>
 		r.name.toLowerCase().includes(query.toLowerCase())
 	);
-  console.log(filteredRestaurants);
 	const skopjeCenter = [41.9981, 21.4254];
 
 	// If search yields one result, we'll fly to it.

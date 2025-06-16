@@ -12,7 +12,7 @@ function ProfileMenuSideBar() {
     const refresh = localStorage.getItem("refresh");
 
     try {
-      await api.post("/auth/logout", { refresh });
+      await api.post("/auth/logout/", { refresh });
     } catch (error) {
       console.error("Logout error:", error.response?.data || error.message);
     } finally {
