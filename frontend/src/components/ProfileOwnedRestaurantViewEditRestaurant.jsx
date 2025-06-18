@@ -94,8 +94,8 @@ function ProfileOwnedRestaurantViewEditRestaurant() {
         description: newData.description,
         address: newData.address,
         phone_number: newData.phone_number,
-        latitude: newData.latitude || 0,
-        longitude: newData.longitude || 0,
+        latitude: newData.latitude ? newData.latitude : 0,
+        longitude: newData.longitude ? newData.longitude : 0,
         default_slot_duration: newData.setup.default_slot_duration,
         operating_hours: formattedOperatingHours,
         table_types: newData.setup.table_types,
@@ -169,7 +169,6 @@ function ProfileOwnedRestaurantViewEditRestaurant() {
       case "basicInfo":
         return (
           <ProfileOwnedRestaurantEditViewFormBasicView
-            basicInformation={basicInformation}
             onSave={handleSave}
             onReturn={() => setFormView("overall")}
           />

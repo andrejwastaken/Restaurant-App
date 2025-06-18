@@ -212,7 +212,7 @@ class OwnedRestaurantDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'description', 'address', 'phone_number', 'is_validated', 'setup']
+        fields = ['id', 'name', 'description', 'address', 'phone_number', 'latitude', 'longitude', 'is_validated', 'setup']
 
 # EDITING RESTAURANT SERIALIZERS
 class RestaurantUpdateSerializer(serializers.ModelSerializer):

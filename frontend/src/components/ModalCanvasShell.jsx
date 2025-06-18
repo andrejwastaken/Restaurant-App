@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ModalCanvasShell({ children, onClose }) {
+function ModalCanvasShell({ children, onClose, label }) {
   const [isShowing, setIsShowing] = useState(false);
 
   useEffect(function () {
@@ -38,9 +38,7 @@ function ModalCanvasShell({ children, onClose }) {
         onClick={handleContentClick}
       >
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-800">
-            Table Setup Configuration
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-800">{label}</h3>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-700 text-3xl leading-none font-semibold focus:outline-none"

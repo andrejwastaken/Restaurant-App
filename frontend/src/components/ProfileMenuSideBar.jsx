@@ -55,14 +55,14 @@ function ProfileMenuSideBar() {
           </NavLink>
 
           <NavLink
-            to="reservation-history"
+            to="your-reservations"
             className={({ isActive }) =>
               `${navLinkBaseClasses} ${
                 isActive ? "bg-gray-300 text-gray-900" : "bg-white"
               }`
             }
           >
-            Reservation History
+            Your reservations
           </NavLink>
 
           <NavLink

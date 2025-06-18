@@ -15,6 +15,8 @@ import ProfileEditPassword from "../../components/ProfileEditPassword";
 import ModalCanvasShell from "../../components/ModalCanvasShell";
 import RestaurantFormTableConfiguration from "../../components/RestaurantFormTableConfiguration";
 import ProfileOwnedRestaurantEditTableConfiguration from "../../components/ProfileOwnedRestaurantEditTableConfiguration";
+import RestaurantFormAddressConfiguration from "../../components/RestaurantFormAddressConfiguration";
+import ProfileOwnedRestaurantEditAddressConfiguration from "../../components/ProfileOwnedRestaurantEditAddressConfiguration";
 
 const MODAL_CONFIG = {
   EDIT_USERNAME: {
@@ -36,10 +38,22 @@ const MODAL_CONFIG = {
   EDIT_TABLE_DATA: {
     title: "Change table",
     Component: RestaurantFormTableConfiguration,
+    label: "Table Setup Configuration",
   },
   EDIT_OWNED_TABLE_DATA: {
     title: "Change owned table",
     Component: ProfileOwnedRestaurantEditTableConfiguration,
+    label: "Table Setup Configuration",
+  },
+  EDIT_ADDRESS_MAP: {
+    title: "Change address map",
+    Component: RestaurantFormAddressConfiguration,
+    label: "Address Setup Configuration",
+  },
+  EDIT_OWNED_ADDRESS_MAP: {
+    title: "Change owned restaurant address map",
+    Component: ProfileOwnedRestaurantEditAddressConfiguration,
+    label: "Address Setup Configuration",
   },
 };
 
@@ -167,11 +181,13 @@ const ProfilePage = () => {
   function handleSaveAddRestaurantItem(updatedData) {
     const finalAddRestaurantData = { ...addRestaurantData, ...updatedData };
     setAddRestaurantData(finalAddRestaurantData);
+    closeModal();
   }
 
   //EDITING CURRENT RESTAURANT LOGIC
   function handleCurrentOwnedRestaurant(data) {
     setCurrentOwnedRestaurant(data);
+    closeModal();
   }
 
   function handleCurrentOwnedRestaurantSubmitCheck(data) {
@@ -219,8 +235,9 @@ const ProfilePage = () => {
         <Footer />
 
         {CurrentModal &&
-          (CurrentModal.title.includes("table") ? (
-            <ModalCanvasShell onClose={closeModal}>
+          (CurrentModal.title.includes("table") ||
+          CurrentModal.title.includes("map") ? (
+            <ModalCanvasShell onClose={closeModal} label={CurrentModal.label}>
               <CurrentModal.Component />
             </ModalCanvasShell>
           ) : (

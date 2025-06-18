@@ -1,3 +1,7 @@
+import { useProfileData } from "../contexts/ProfileDataContext";
+
+import PersonalInfoLabel from "./PersonalInfoLabel";
+
 function RestaurantFormBasicViewContent({
   name,
   description,
@@ -6,6 +10,8 @@ function RestaurantFormBasicViewContent({
   default_reservation_slot_duration,
   onChange,
 }) {
+  const { openModal } = useProfileData();
+
   return (
     <div className="w-full h-full mt-10 space-y-4 overflow-true">
       <div className="space-y-2">
@@ -24,14 +30,13 @@ function RestaurantFormBasicViewContent({
 
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Restaurant Address
+          Restaurant Description
         </label>
-        <input
-          name="address"
-          type="text"
-          value={address}
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={description}
           onChange={onChange}
-          placeholder="(Булевар) Кирилица/Latinica 42"
           className="w-full border p-2 mb-4 rounded"
         />
       </div>
@@ -52,19 +57,6 @@ function RestaurantFormBasicViewContent({
 
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Restaurant Description
-        </label>
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={description}
-          onChange={onChange}
-          className="w-full border p-2 mb-4 rounded"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
           Minimum reservation timeslot
         </label>
         <input
@@ -74,6 +66,25 @@ function RestaurantFormBasicViewContent({
           onChange={onChange}
           placeholder="ex. 60min"
           className="w-full border p-2 mb-4 rounded"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label
+          htmlFor="address-input"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Restaurant Address
+        </label>
+        <input
+          id="address-input"
+          name="address"
+          type="text"
+          value={address}
+          readOnly
+          onClick={() => openModal("EDIT_ADDRESS_MAP", null)}
+          placeholder="(Булевар) Кирилица/Latinica 42"
+          className="w-full border-2 border-gray-200 p-3 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 hover:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 transition-colors duration-200"
         />
       </div>
     </div>

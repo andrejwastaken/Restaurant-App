@@ -1,27 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
 import RestaurantFormBasicViewContent from "./RestaurantFormBasicViewContent";
 import ProfileOwnedRestaurantEditViewFormBasicViewContent from "./ProfileOwnedRestaurantEditViewFormBasicViewContent";
 import { useProfileData } from "../contexts/ProfileDataContext";
 
-function ProfileOwnedRestaurantEditViewFormBasicView({
-  basicInformation,
-  onSave,
-  onReturn,
-}) {
+function ProfileOwnedRestaurantEditViewFormBasicView({ onSave, onReturn }) {
   const { currentOwnedRestaurant, handleCurrentOwnedRestaurant } =
     useProfileData();
   const [currentBasicInformation, setCurrentBasicInformation] = useState(
-    basicInformation
-      ? basicInformation
+    currentOwnedRestaurant
+      ? currentOwnedRestaurant
       : {
           name: "",
           description: "",
           address: "",
           phone_number: "",
           default_reservation_slot_duration: "",
+          latitude: 0,
+          longitude: 0,
         }
+  );
+
+  useEffect(
+    function () {
+      setCurrentBasicInformation({
+        ...currentBasicInformation,
+        name: currentOwnedRestaurant.name,
+        description: currentOwnedRestaurant.description,
+        address: currentOwnedRestaurant.address,
+        phone_number: currentOwnedRestaurant.phone_number,
+        latitude: currentOwnedRestaurant.latitude,
+        longitude: currentOwnedRestaurant.longitude,
+        default_reservation_slot_duration:
+          currentOwnedRestaurant.setup.default_slot_duration,
+      });
+    },
+    [currentOwnedRestaurant]
   );
 
   const handleChange = (e) => {
@@ -44,6 +59,8 @@ function ProfileOwnedRestaurantEditViewFormBasicView({
       description: currentBasicInformation.description,
       address: currentBasicInformation.address,
       phone_number: currentBasicInformation.phone_number,
+      latitude: currentBasicInformation.latitude,
+      longitude: currentBasicInformation.longitude,
       setup: {
         ...currentOwnedRestaurant.setup,
         default_slot_duration:
