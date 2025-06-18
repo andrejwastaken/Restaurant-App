@@ -119,7 +119,7 @@ function RestaurantFormOperatingHoursViewContent({
               <span>to</span>
               <select
                 className="border p-2 rounded-md bg-white disabled:bg-gray-200"
-                value={dayInfo?.close_time || "17:00"}
+                value={dayInfo?.close_time?.slice(0, 5) || "17:00"}
                 onChange={(e) =>
                   handleTimeChange(day.key, "close_time", e.target.value)
                 }

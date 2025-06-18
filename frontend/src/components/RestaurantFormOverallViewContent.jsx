@@ -20,7 +20,7 @@ function RestaurantFormOverallViewContent({
   };
 
   return (
-    <div className="w-full h-full mt-10 overflow-true">
+    <div className="w-full h-full mt-7 overflow-true">
       <RestaurantFormEditor
         label="Basic Information"
         handleClick={() => onClick("basicInfo")}

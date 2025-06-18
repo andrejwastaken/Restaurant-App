@@ -5,11 +5,13 @@ import api from "../api/api";
 import RestaurantUpdateContext from "../contexts/RestaurantUpdateContext";
 import Loading from "./Loading";
 import ProfileOwnedRestaurantsList from "./ProfileOwnedRestaurantsList";
+import { useProfileData } from "../contexts/ProfileDataContext";
 
 function ProfileOwnedRestaurants() {
   const [restaurants, setRestaurants] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const { loadingDuringSaveEdit } = useProfileData();
   const { restaurantId } = useParams();
 
   useEffect(function () {
@@ -34,6 +36,8 @@ function ProfileOwnedRestaurants() {
     <div className="w-full h-full p-6 flex flex-col">
       {isLoading ? (
         <Loading>Loading your restaurants...</Loading>
+      ) : loadingDuringSaveEdit ? (
+        <Loading>Saving your data...</Loading>
       ) : restaurantId ? (
         <Outlet />
       ) : (

@@ -1,10 +1,10 @@
 from rest_framework import permissions, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Restaurant, RestaurantSetup, TableType, Table
 from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer, \
-    OwnedRestaurantDetailSerializer
+    OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer
 from datetime import datetime
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
@@ -12,8 +12,6 @@ from geopy.geocoders import Nominatim
 
 
 class RestaurantListDetailAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
     def get(self, request, pk=None):
         if pk:
             try:
@@ -79,6 +77,26 @@ class SetupRestaurantTablesView(APIView):
             return Response({"message": "Floor plan saved successfully."}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateRestaurantView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, restaurant_id):
+        # Find the restaurant and ensure the requester is the owner in one step.
+        restaurant = get_object_or_404(Restaurant, pk=restaurant_id, owner=request.user)
+
+        # Instantiate the serializer with the instance to update and the new data.
+        serializer = RestaurantUpdateSerializer(
+            instance=restaurant,
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save()  # This calls the .update() method in the serializer
+            return Response({"message": "Restaurant profile updated successfully."}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # class TimeSlotCreateAPIView(APIView):
 #     permission_classes = [permissions.IsAuthenticated]

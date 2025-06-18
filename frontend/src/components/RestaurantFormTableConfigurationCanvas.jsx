@@ -33,7 +33,7 @@ function RestaurantFormTableConfigurationCanvas({
       context.fillStyle = isPending ? "rgba(59, 130, 246, 0.5)" : "#F0F0F0";
       context.strokeStyle = isPending ? "rgb(37, 99, 235)" : "black";
       context.lineWidth = isPending ? 2 : 1;
-      if (table.shape === "circle") {
+      if (table.shape.toLowerCase() === "circle") {
         context.beginPath();
         context.arc(table.x, table.y, table.radius, 0, 2 * Math.PI);
         context.fill();

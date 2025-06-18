@@ -14,6 +14,7 @@ import ProfileEditPhoneNumber from "../../components/ProfileEditPhoneNumber";
 import ProfileEditPassword from "../../components/ProfileEditPassword";
 import ModalCanvasShell from "../../components/ModalCanvasShell";
 import RestaurantFormTableConfiguration from "../../components/RestaurantFormTableConfiguration";
+import ProfileOwnedRestaurantEditTableConfiguration from "../../components/ProfileOwnedRestaurantEditTableConfiguration";
 
 const MODAL_CONFIG = {
   EDIT_USERNAME: {
@@ -34,28 +35,11 @@ const MODAL_CONFIG = {
   },
   EDIT_TABLE_DATA: {
     title: "Change table",
-  },
-  EDIT_USERNAME: {
-    Component: ProfileEditUsername,
-    title: "Change Username",
-  },
-  EDIT_EMAIL: {
-    Component: ProfileEditEmail,
-    title: "Change Email Address",
-  },
-  EDIT_PHONE_NUMBER: {
-    Component: ProfileEditPhoneNumber,
-    title: "Change Phone Number",
-  },
-  EDIT_PASSWORD: {
-    Component: ProfileEditPassword,
-    title: "Change Password",
-  },
-  EDIT_TABLE_DATA: {
-    title: "Change table",
+    Component: RestaurantFormTableConfiguration,
   },
   EDIT_OWNED_TABLE_DATA: {
     title: "Change owned table",
+    Component: ProfileOwnedRestaurantEditTableConfiguration,
   },
 };
 
@@ -79,25 +63,12 @@ const ProfilePage = () => {
     tablesInformation: [],
     operatingHoursInformation: [],
   });
-  const [userData, setUserData] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeModal, setActiveModal] = useState(null);
-  const [initialDataForModal, setInitialDataForModal] = useState(null);
-  const [isLoadingDuringSubmit, setIsLoadingDuringSubmit] = useState(false);
-  const [addRestaurantData, setAddRestaurantData] = useState({
-    basicInformation: {
-      name: "",
-      description: "",
-      address: "",
-      phone_number: "",
-      default_reservation_slot_duration: "",
-    },
-    tableTypesInformation: [],
-    tablesInformation: [],
-    operatingHoursInformation: [],
-  });
 
   const [currentOwnedRestaurant, setCurrentOwnedRestaurant] = useState({});
+  const [
+    currentOwnedRestaurantSubmitCheck,
+    setCurrentOwnedRestaurantSubmitCheck,
+  ] = useState({});
   const [loadingDuringSaveEdit, setLoadingDuringSaveEdit] = useState(false);
 
   useEffect(() => {
@@ -197,15 +168,14 @@ const ProfilePage = () => {
     const finalAddRestaurantData = { ...addRestaurantData, ...updatedData };
     setAddRestaurantData(finalAddRestaurantData);
   }
-  //ADD RESTAURANT SAVING LOGIC
-  function handleSaveAddRestaurantItem(updatedData) {
-    const finalAddRestaurantData = { ...addRestaurantData, ...updatedData };
-    setAddRestaurantData(finalAddRestaurantData);
-  }
 
   //EDITING CURRENT RESTAURANT LOGIC
   function handleCurrentOwnedRestaurant(data) {
     setCurrentOwnedRestaurant(data);
+  }
+
+  function handleCurrentOwnedRestaurantSubmitCheck(data) {
+    setCurrentOwnedRestaurantSubmitCheck(data);
   }
 
   function handleLoadingDuringSaveEdit(state) {
@@ -214,19 +184,20 @@ const ProfilePage = () => {
 
   const profileContextValue = {
     user: userData,
+    //MODAL INFO
     openModal: openModal,
     isLoadingDuringSubmit: isLoadingDuringSubmit,
+    // RESTAURANT ADDING
     addRestaurantData: addRestaurantData,
     handleSaveAddRestaurantItem: handleSaveAddRestaurantItem,
-  };
-  const profileContextValue = {
-    user: userData,
-    openModal: openModal,
-    isLoadingDuringSubmit: isLoadingDuringSubmit,
-    addRestaurantData: addRestaurantData,
-    handleSaveAddRestaurantItem: handleSaveAddRestaurantItem,
+    // RESTAURANT EDITING
     currentOwnedRestaurant: currentOwnedRestaurant,
     handleCurrentOwnedRestaurant: handleCurrentOwnedRestaurant,
+    // CHECK WHETHER CHANGES MADE
+    currentOwnedRestaurantSubmitCheck: currentOwnedRestaurantSubmitCheck,
+    handleCurrentOwnedRestaurantSubmitCheck:
+      handleCurrentOwnedRestaurantSubmitCheck,
+    // LOADING WHILE SAVING IN EDIT
     loadingDuringSaveEdit: loadingDuringSaveEdit,
     handleLoadingDuringSaveEdit: handleLoadingDuringSaveEdit,
   };
@@ -250,7 +221,7 @@ const ProfilePage = () => {
         {CurrentModal &&
           (CurrentModal.title.includes("table") ? (
             <ModalCanvasShell onClose={closeModal}>
-              <RestaurantFormTableConfiguration />
+              <CurrentModal.Component />
             </ModalCanvasShell>
           ) : (
             <ModalShell title={CurrentModal.title} onClose={closeModal}>

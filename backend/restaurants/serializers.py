@@ -191,7 +191,7 @@ class TableDetailSerializer(serializers.ModelSerializer):
 class OperatingHoursDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = OperationHours
-        fields = ['id', 'day_of_week', 'open_time', 'close_time']
+        fields = ['day_of_week', 'open_time', 'close_time']
 
 class RestaurantSetupDetailSerializer(serializers.ModelSerializer):
     """Nests all the setup-related details together for a comprehensive view."""
@@ -201,7 +201,7 @@ class RestaurantSetupDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RestaurantSetup
-        fields = ['default_slot_duration', 'operating_hours', 'table_types', 'tables']
+        fields = ['id', 'default_slot_duration', 'operating_hours', 'table_types', 'tables']
 
 class OwnedRestaurantDetailSerializer(serializers.ModelSerializer):
     setup = RestaurantSetupDetailSerializer(read_only=True)
@@ -209,4 +209,57 @@ class OwnedRestaurantDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
         fields = ['id', 'name', 'description', 'address', 'phone_number', 'is_validated', 'setup']
+
+# EDITING RESTAURANT SERIALIZERS
+class RestaurantUpdateSerializer(serializers.ModelSerializer):
+    operating_hours = OperatingHoursNestedSerializer(many=True)
+    table_types = TableTypeNestedCreateSerializer(many=True)
+    default_slot_duration = serializers.IntegerField()
+
+    class Meta:
+        model = Restaurant
+        fields = [
+            'name', 'description', 'address', 'phone_number',
+            'is_validated', 'latitude', 'longitude', 'default_slot_duration',
+            'operating_hours', 'table_types',
+        ]
+        read_only_fields = ['is_validated']
+        extra_kwargs = {
+            'name': {'validators': []},
+        }
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        setup = instance.setup
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.address = validated_data.get('address', instance.address)
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.latitude = validated_data.get('latitude', instance.latitude)
+        instance.longitude = validated_data.get('longitude', instance.longitude)
+        instance.save()
+
+        setup.default_slot_duration = validated_data.get('default_slot_duration', setup.default_slot_duration)
+        setup.save()
+
+        # Delete and rewrite Operating Hours
+        if 'operating_hours' in validated_data:
+            OperationHours.objects.filter(setup=setup).delete()
+            hours_data = validated_data.get('operating_hours', [])
+            hours_to_create = [OperationHours(setup=setup, **data) for data in hours_data]
+            OperationHours.objects.bulk_create(hours_to_create)
+
+        # Delete and rewrite Table Types
+        if 'table_types' in validated_data:
+            # Important: You must delete tables that depend on these types first!
+            Table.objects.filter(setup=setup).delete()
+            TableType.objects.filter(setup=setup).delete()  # Delete all old types
+            types_data = validated_data.get('table_types', [])
+            types_to_create = [TableType(setup=setup, **data) for data in types_data]
+            TableType.objects.bulk_create(types_to_create)  # Create all new types
+
+        return instance
+
+
 
