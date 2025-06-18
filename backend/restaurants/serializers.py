@@ -3,11 +3,26 @@ from rest_framework.validators import UniqueValidator
 from django.db import transaction
 from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours
 
-        
+class OperatingHoursNestedSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        """Check if opening time is before closing"""
+        if data['open_time'] >= data['close_time']:
+            raise serializers.ValidationError("Closing time must be after opening time")
+        return data
+
+    class Meta:
+        model = OperationHours
+        fields = ['day_of_week', 'open_time', 'close_time']
+
 class RestaurantSerializer(serializers.ModelSerializer):
+    default_slot_duration = serializers.IntegerField(source='setup.default_slot_duration', read_only=True)
+    operating_hours = OperatingHoursNestedSerializer(many=True, source='setup.operating_hours', read_only=True)
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'description', 'is_validated', 'address', 'phone_number', 'latitude', 'longitude']
+        fields = [
+            'id', 'name', 'description', 'is_validated', 'address', 'phone_number',
+            'latitude', 'longitude', 'default_slot_duration', 'operating_hours'
+        ]
 
 class RestaurantSetupNestedSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,17 +72,6 @@ class TableSerializer(serializers.ModelSerializer):
             )
 
         return data
-
-class OperatingHoursNestedSerializer(serializers.ModelSerializer):
-    def validate(self, data):
-        """Check if opening time is before closing"""
-        if data['open_time'] >= data['close_time']:
-            raise serializers.ValidationError("Closing time must be after opening time")
-        return data
-
-    class Meta:
-        model = OperationHours
-        fields = ['day_of_week', 'open_time', 'close_time']
 
 class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):
     """

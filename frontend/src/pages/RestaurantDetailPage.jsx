@@ -110,14 +110,19 @@ function RestaurantDetailPage() {
 						{/* Action Button */}
 						<div className="mt-10 text-center">
 							{isAuthorized ? (
-								// If user is logged in, show the "Check Availability" button
-								<button className="w-full max-w-xs px-8 py-3 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50">
-									Check Available Spots
-								</button>
-							) : (
-								// If user is logged out, show the "Login" button
 								<Link
-									to="/login" // Make sure this is your actual login route
+									to={`/restaurants-calendar/${id}`}
+									state={{
+										restaurantTimeSlot: restaurant.default_slot_duration,
+										restaurantOperatingHours: restaurant.operating_hours,
+									}}
+									className="w-full max-w-xs px-8 py-3 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+								>
+									Check Available Spots
+								</Link>
+							) : (
+								<Link
+									to="/login" 
 									className="inline-block w-full max-w-xs px-8 py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
 								>
 									Log in to see availability.
