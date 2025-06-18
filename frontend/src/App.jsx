@@ -24,6 +24,7 @@ import ProfileAddRestaurant from "./components/ProfileAddRestaurant";
 import RestaurantDetailPage from "./pages/RestaurantDetailPage";
 import RestaurantsCalendar from "./pages/RestaurantsCalendar";
 import RestaurantsUserDetails from "./pages/RestaurantsUserDetails";
+import ReservationShowTables from './pages/ReservationShowTables';
 
 const router = createBrowserRouter([
   {
@@ -47,10 +48,18 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/reservation-details",
+    path: "/reservation-details/:id",
     element: (
       <ProtectedRoute>
         <RestaurantsUserDetails />
+      </ProtectedRoute>
+    ),
+  },
+   {
+    path: "/available-tables/:id",
+    element: (
+      <ProtectedRoute>
+        <ReservationShowTables />
       </ProtectedRoute>
     ),
   },

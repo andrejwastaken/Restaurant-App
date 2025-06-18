@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
 	ArrowLeft,
 	Users,
@@ -8,6 +8,8 @@ import {
 	Calendar,
 	Search,
 } from "lucide-react";
+import api from "../api/api";
+import { toast } from "react-hot-toast";
 
 const InfoSection = ({ icon, title, children }) => (
 	<div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -22,11 +24,14 @@ const InfoSection = ({ icon, title, children }) => (
 function ReservationDetailsPage() {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { id } = useParams();
+	const restaurantId = parseInt(location.state?.restaurantId);
+	const day = parseInt(location.state?.selectedDay);
 	const selectedDateISO = location.state?.selectedDate;
 	const selectedTimeSlot = location.state?.selectedTimeSlot;
 	const restaurantOperatingHours = location.state?.restaurantOperatingHours;
 	const defaultSlotDuration = location.state?.restaurantTimeSlot;
-    const selectedDate = useMemo(
+	const selectedDate = useMemo(
 		() => new Date(selectedDateISO),
 		[selectedDateISO]
 	);
@@ -78,14 +83,40 @@ function ReservationDetailsPage() {
 		defaultSlotDuration,
 	]);
 
-	const handleFindTables = () => {
-		console.log("Searching for tables with the following details:");
+	const handleFindTables = async () => {
+		const params = {
+			time: selectedTimeSlot,
+			party_size: Number(partySize),
+			is_smoker: isSmoker,
+			duration: Number(duration),
+			day: day,
+		};
+
+		try {
+			const response = await api.get(
+				`api/restaurants-availability/${restaurantId}/`,
+				{ params }
+			);
+			console.log(response.data);
+			navigate(`/available-tables/${id}`, {
+                state: {
+                    availableTables: response.data.tables, 
+                    unavailableTables: response.data.unavailable, 
+                    reservationDetails: params 
+                }
+            });
+		} catch (error) {
+			console.error("Finding tables failed", error);
+			toast.error("No tables found.");
+		}
 		console.log({
 			date: selectedDate.toLocaleDateString(),
 			time: selectedTimeSlot,
 			partySize: Number(partySize),
 			isSmoker,
 			duration: Number(duration),
+			restaurantId: location.state.restaurantId,
+			day: day
 		});
 	};
 

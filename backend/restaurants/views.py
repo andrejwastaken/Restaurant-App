@@ -2,15 +2,15 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Restaurant, RestaurantSetup, TableType, Table
+from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours
 from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer, \
-    OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer
+    OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer, TableSerializer
 from datetime import datetime
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
-
+from datetime import timedelta
 
 class RestaurantListDetailAPIView(APIView):
     def get(self, request, pk=None):
@@ -239,42 +239,56 @@ class ReverseGeocodeView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )        
         
-# class RestaurantAvailabilityAPIView(APIView):
-#     """
-#     Handles GET requests for a restaurant's real-time availability on a specific date.
-#     """
-#     permission_classes = [permissions.IsAuthenticated]
-#
-#     def get(self, request, restaurant_id):
-#         # 1. Get and validate the date from query parameters
-#         date_str = request.query_params.get('date')
-#         if not date_str:
-#             return Response({"error": "A 'date' query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         try:
-#             requested_date = datetime.strptime(date_str, '%d-%m-%Y').date()
-#         except ValueError:
-#             return Response({"error": "Invalid date format. Use DD-MM-YYYY."}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         # 2. Fetch all available time slots for that restaurant and date from the database
-#         time_slots = TimeSlot.objects.filter(
-#             setup__restaurant_id=restaurant_id,
-#             date=requested_date,
-#             quantity_available__gt=0  # Only fetch slots that have at least 1 table available
-#         ).select_related('table_type').order_by('time')
-#
-#         # 3. Group the flat list of slots into a nested structure by time
-#         grouped_slots = defaultdict(list)
-#         for slot in time_slots:
-#             # We use strftime to get a consistent key like "19:00:00"
-#             grouped_slots[slot.time.strftime('%H:%M:%S')].append(slot)
-#
-#         # 4. Format the response
-#         response_data = []
-#         for time, slots_at_time in grouped_slots.items():
-#             response_data.append({
-#                 'time': time,
-#                 'available_tables': TimeSlotSerializer(slots_at_time, many=True).data
-#             })
-#
-#         return Response(response_data)
+class RestaurantAvailabilityAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, restaurant_id):
+        date = request.query_params.get('date')
+        day = request.query_params.get('day')
+        time = request.query_params.get('time')
+        party_size = request.query_params.get('party_size')
+        is_smoker = request.query_params.get('is_smoker')
+        is_smoker = True if is_smoker == 'true' else False
+        restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
+        setup = get_object_or_404(RestaurantSetup, restaurant=restaurant)
+        try:
+            day_int = int(day)
+        except (TypeError, ValueError):
+            return Response({'error': 'Invalid day parameter.'}, status=status.HTTP_400_BAD_REQUEST)
+        operation_hours_for_restaurant = get_object_or_404(OperationHours, setup=setup, day_of_week=day_int)
+        # Validate input
+        if not time or not party_size:
+            return Response({'error': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            party_size = int(party_size)
+        except ValueError:
+            return Response({'error': 'Invalid party_size.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            dt = datetime.strptime(time, "%H:%M")
+        except ValueError:
+            return Response({'error': 'Invalid time format. Use ISO format.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        opening = operation_hours_for_restaurant.open_time
+        closing = operation_hours_for_restaurant.close_time
+
+        duration = int(request.query_params.get('duration', 120))
+        end_time = (dt + timedelta(minutes=duration)).time()
+        if not (opening <= dt.time() < closing and opening < end_time <= closing):
+            return Response({'error': 'Requested time is outside operational hours.'}, status=status.HTTP_400_BAD_REQUEST)
+        table_types = TableType.objects.filter(setup=setup, capacity__gte=party_size)
+        tables = Table.objects.filter(
+            setup=setup,
+            is_smoking=is_smoker,
+            table_type__in=table_types
+        )
+        unavailable = Table.objects.filter(setup=setup).exclude(is_smoking=is_smoker,
+            table_type__in=table_types)
+        unavailable_serializer = TableSerializer(unavailable, many=True)
+        table_serializer = TableSerializer(tables, many=True)
+
+        return Response({
+            'tables': table_serializer.data,
+            'unavailable': unavailable_serializer.data,
+        }, status=status.HTTP_200_OK)
+        

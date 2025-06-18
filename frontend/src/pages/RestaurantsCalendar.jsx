@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Clock, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -7,6 +7,7 @@ function RestaurantsCalendar() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { state } = location;
+	const { id } = useParams();
 
 	const [selectedDate, setSelectedDate] = useState(null);
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
@@ -309,12 +310,14 @@ function RestaurantsCalendar() {
 										</p>
 									</div>
 									<Link
-										to="/reservation-details"
+										to={`/reservation-details/${id}`}
 										state={{
 											selectedDate: selectedDate.toISOString(),
+											selectedDay: selectedDate.getDay(), 
 											selectedTimeSlot,
 											restaurantOperatingHours,
 											restaurantTimeSlot,
+											restaurantId: id,
 										}}
 										onClick={(e) => !selectedTimeSlot && e.preventDefault()}
 										className={`px-4 py-2 font-bold text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors transform hover:scale-105 ${

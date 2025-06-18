@@ -2,7 +2,7 @@ from django.urls import path
 from .views import RestaurantListDetailAPIView, CreateRestaurantView, OwnedRestaurantsListView, \
     SetupRestaurantTablesView, OwnedRestaurantDetailView, UpdateRestaurantView
 from .views import RestaurantListDetailAPIView, CreateRestaurantView, OwnedRestaurantsListView, \
-    SetupRestaurantTablesView, GeocodeView, ReverseGeocodeView
+    SetupRestaurantTablesView, GeocodeView, ReverseGeocodeView, RestaurantAvailabilityAPIView
 
 urlpatterns = [
     path('restaurants/', RestaurantListDetailAPIView.as_view(), name='restaurant-list'),
@@ -19,8 +19,8 @@ urlpatterns = [
         UpdateRestaurantView.as_view(),
         name='owned-restaurant-update-profile'
     ),
+    path('restaurants-availability/<int:restaurant_id>/', RestaurantAvailabilityAPIView.as_view(), name='restaurant-availability'),
 
-    # This URL handles updating the restaurant's floor plan (tables).
     path('geocode/', GeocodeView.as_view(), name='geocode-restaurant'),
     path('reverse-geocode/', ReverseGeocodeView.as_view(), name='reverse-geocode-restaurant')
 ]
