@@ -66,7 +66,7 @@ function Navbar() {
   }, [dropdownOpen]);
 
   return (
-    <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-[70]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">

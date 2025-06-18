@@ -23,6 +23,7 @@ import ProfileOwnedRestaurantViewEditRestaurant from "./components/ProfileOwnedR
 import ProfileAddRestaurant from "./components/ProfileAddRestaurant";
 import RestaurantDetailPage from "./pages/RestaurantDetailPage";
 import RestaurantsCalendar from "./pages/RestaurantsCalendar";
+import RestaurantsUserDetails from "./pages/RestaurantsUserDetails";
 
 const router = createBrowserRouter([
 	{
@@ -42,6 +43,14 @@ const router = createBrowserRouter([
 		element: (
 			<ProtectedRoute>
 				<RestaurantsCalendar />
+			</ProtectedRoute>
+		),
+	},
+	{
+		path: "/reservation-details",
+		element: (
+			<ProtectedRoute>
+				<RestaurantsUserDetails />
 			</ProtectedRoute>
 		),
 	},
