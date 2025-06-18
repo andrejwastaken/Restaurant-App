@@ -12,8 +12,8 @@ class Restaurant(models.Model):
     description = models.TextField(blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    latitude = models.DecimalField(max_digits=12, decimal_places=10, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=12, decimal_places=10, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=17, decimal_places=15, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=17, decimal_places=15, null=True, blank=True)
     # main_image_url = models.URLField(blank=True, null=True) maybe we can use this later
     is_validated = models.BooleanField(default=False)
 

@@ -9,6 +9,7 @@ from datetime import datetime
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
 from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderUnavailable
 
 
 class RestaurantListDetailAPIView(APIView):
@@ -183,6 +184,60 @@ class GeocodeView(APIView):
                 return Response({'error': 'Address not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ReverseGeocodeView(APIView):
+    def post(self, request, *args, **kwargs):
+        latitude = request.data.get('latitude')
+        longitude = request.data.get('longitude')
+
+        if not latitude or not longitude:
+            return Response(
+                {'error': 'Latitude and Longitude are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        geolocator = Nominatim(user_agent="skopje_restaurant_app_reverse")
+        
+        try:
+            location = geolocator.reverse(
+                f"{latitude}, {longitude}",
+                exactly_one=True,
+                language='mk,en' 
+            )
+
+            if not location:
+                return Response(
+                    {'error': 'Address not found for these coordinates'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            address_parts = location.raw.get('address', {})
+            city_keys = ['city', 'town', 'county', 'municipality']
+            skopje_names = {'Skopje', 'Скопје'}
+
+            is_in_skopje = any(
+                address_parts.get(key) in skopje_names for key in city_keys
+            )
+
+            if not is_in_skopje:
+                return Response(
+                    {'error': 'The selected location is outside Skopje.'},
+                    status=status.HTTP_400_BAD_REQUEST 
+                )
+
+            return Response({'address': location.address}, status=status.HTTP_200_OK)
+
+        except GeocoderUnavailable:
+            return Response(
+                {'error': 'Geocoding service is unavailable. Please try again later.'},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
+        except Exception as e:
+            print(f"Error during reverse geocoding: {e}")
+            return Response(
+                {'error': 'An unexpected error occurred.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )        
         
 # class RestaurantAvailabilityAPIView(APIView):
 #     """

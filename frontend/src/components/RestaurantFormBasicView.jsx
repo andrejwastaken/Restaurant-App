@@ -4,10 +4,12 @@ import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
 import RestaurantFormBasicViewContent from "./RestaurantFormBasicViewContent";
 import toast from "react-hot-toast";
 import api from "../api/api";
-import RestaurantLocationPicker from "../components/Map";
+import RestaurantLocationPicker from "../components/Map"; 
 
 function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
 	const [isGeocoding, setIsGeocoding] = useState(false);
+	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
+
 	const [currentBasicInformation, setCurrentBasicInformation] = useState(
 		basicInformation
 			? basicInformation
@@ -24,11 +26,9 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
-
 		if (name === "default_reservation_slot_duration" && value < 0) {
 			return;
 		}
-
 		setCurrentBasicInformation((prevInfo) => ({
 			...prevInfo,
 			[name]: value,
@@ -66,23 +66,51 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
 		}
 	};
 
-	const handlePositionChange = (lat, lng) => {
+	const handlePositionChange = async (lat, lng) => {
+		// Optimistically update coordinates in state
 		setCurrentBasicInformation((prev) => ({
 			...prev,
 			latitude: lat,
 			longitude: lng,
 		}));
+
+		setIsReverseGeocoding(true);
+		try {
+			const response = await api.post("api/reverse-geocode/", {
+				latitude: lat,
+				longitude: lng,
+			});
+			let { address } = response.data;
+			const formatted_address = address.split(",").slice(0, 2);
+			address = formatted_address[1].trim() + " " + formatted_address[0].trim();
+			address = address.trim();
+			if (address) {
+				setCurrentBasicInformation((prev) => ({ ...prev, address: address }));
+			} else {
+				toast.error("No address found for this location.");
+			}
+		} catch (error) {
+			console.error("Reverse geocoding failed", error);
+			toast.error(
+				"Failed to retrieve address. Please try a different location."
+			);
+		} finally {
+			setIsReverseGeocoding(false);
+		}
 	};
 
 	return (
 		<div className="w-full h-screen p-6 flex flex-col">
-			{/* This top div will contain all the form content and become scrollable */}
 			<div className="flex-1 overflow-y-auto pr-2">
 				<ProfileMenuContentTitle label="Basic Information" />
 				<RestaurantFormBasicViewContent
 					name={currentBasicInformation.name}
 					description={currentBasicInformation.description}
-					address={currentBasicInformation.address}
+					address={
+						isReverseGeocoding
+							? "Fetching address..."
+							: currentBasicInformation.address
+					}
 					phone_number={currentBasicInformation.phone_number}
 					default_reservation_slot_duration={
 						currentBasicInformation.default_reservation_slot_duration
@@ -98,12 +126,13 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
 						<button
 							onClick={handleGeocode}
 							disabled={isGeocoding}
-							className="w-full bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none disabled:bg-blue-300"
+							className="w-full bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 focus:outline-none disabled:bg-gray-400"
 						>
 							{isGeocoding ? "Finding..." : "Find Address on Map"}
 						</button>
 					</div>
-					<div className="w-full">
+					<div className="w-full h-96">
+						{" "}
 						<RestaurantLocationPicker
 							position={[
 								currentBasicInformation.latitude,
@@ -115,7 +144,6 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
 				</div>
 			</div>
 
-			{/* This bottom div with buttons stays fixed at the bottom */}
 			<div className="flex space-x-4 pt-4">
 				<button
 					className="w-full bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none"

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Outlet } from "react-router-dom";
 
 import api from "../api/api";
-import RestaurantUpdateContext from "../contexts/RestaurantUpdateContext";
+// import RestaurantUpdateContext from "../contexts/RestaurantUpdateContext";
 import Loading from "./Loading";
 import ProfileOwnedRestaurantsList from "./ProfileOwnedRestaurantsList";
 import { useProfileData } from "../contexts/ProfileDataContext";
