@@ -8,8 +8,8 @@ import Footer from "../../components/Footer";
 const Finalizer = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	console.log(location.state);
-	const reservationDetails = location.state?.message;
+	const reservationDetails = location.state;
+	console.log(reservationDetails);
 	if (!reservationDetails) {
 		return (
 			<div className="flex flex-col items-center justify-center h-screen bg-gray-50 text-red-600">
@@ -23,9 +23,9 @@ const Finalizer = () => {
 			</div>
 		);
 	}
-
-	// Data to be embedded in the QR code. For a real app, this should be a URL
-	const qrCodeValue = "http://localhost:3000/reservations";
+	const restaurant_id = reservationDetails.restaurant_id
+	const reservation_id = reservationDetails.reservation_id;
+	const qrCodeValue = "http://localhost:3000/user/owned-restaurants/" +restaurant_id + "/reservations/" + reservation_id;
 
 	// We use a public QR code generation API to avoid needing a library.
 	const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
@@ -50,10 +50,9 @@ const Finalizer = () => {
 
 					<hr />
 
-					{/* QR Code Section */}
 					<div className="flex flex-col items-center justify-center pt-4">
 						<p className="text-sm font-semibold text-gray-600 mb-3">
-							Scan for Reservation Details
+							Scan for Reservation Details.
 						</p>
 						<div className="p-4 bg-white rounded-lg border">
 							<img
@@ -65,7 +64,6 @@ const Finalizer = () => {
 						</div>
 					</div>
 
-					{/* Action Button */}
 					<button
 						onClick={() => navigate("/")}
 						className="w-full mt-6 px-4 py-3 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-colors"

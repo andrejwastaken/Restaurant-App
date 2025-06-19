@@ -1,5 +1,8 @@
 from datetime import datetime, date, time, timedelta
 from django.db import transaction
+
+from .serializers import ReservationListSerializer
+from restaurants.models import Restaurant
 from .models import Reservation, Table, ClientProfile
 from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
@@ -7,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from restaurants.serializers import TableSerializer
+
 class ReservationCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -47,6 +51,8 @@ class ReservationCreateAPIView(APIView):
 
                 success_response = {
                     "message": "Reservation confirmed successfully!",
+                    "reservation_id": new_reservation.id,
+                    "restaurant_id": table_to_book.setup.restaurant.id,
                 }
                 return Response(success_response, status=status.HTTP_201_CREATED)
 
@@ -63,6 +69,40 @@ class ReservationCreateAPIView(APIView):
                 {"success": False, "error": "An unexpected server error occurred."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class ReservationListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None):
+        user = request.user
+
+        # --- Use Case 1: Fetching reservations for a restaurant owner ---
+        if pk:
+            try:
+                restaurant = Restaurant.objects.get(pk=pk, owner=user)
+            except Restaurant.DoesNotExist:
+                return Response(
+                    {"error": "You do not have permission to view reservations for this restaurant."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            queryset = Reservation.objects.filter(
+                table__setup__restaurant=restaurant
+            ).select_related(
+                'table', 'client__user' 
+            ).order_by('-start_time')
+
+        else:
+            queryset = Reservation.objects.filter(
+                client__user=user
+            ).select_related(
+                'table', 'client__user' 
+            ).order_by('-start_time')
+
+        serializer = ReservationListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 @transaction.atomic # Ensure that all operations are atomic (all or nothing)
 def cancel_reservation(reservation_id, client_id):
