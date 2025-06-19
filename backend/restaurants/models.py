@@ -143,7 +143,7 @@ class OperationHours(models.Model):
                 f'{self.open_time.strftime("%H:%M")} - '
                 f'{self.close_time.strftime("%H:%M")}')
 
-class SpecialDay:
+class SpecialDay(models.Model):
     setup = models.ForeignKey(
         RestaurantSetup,
         on_delete=models.CASCADE,

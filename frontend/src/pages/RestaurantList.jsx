@@ -70,7 +70,6 @@ function RestaurantList() {
 		setFilteredRestaurants(filteredList);
 		setVisibleCount(INITIAL_VISIBLE_COUNT);
 	}, [query, allRestaurants]);
-	console.log(filteredRestaurants);
 	const handleLoadMore = () => {
 		setVisibleCount((prevCount) => prevCount + 10);
 	};

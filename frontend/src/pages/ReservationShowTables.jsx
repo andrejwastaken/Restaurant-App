@@ -1,118 +1,131 @@
-// src/pages/AvailableTablesPage.js (or wherever you store your page components)
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { ArrowLeft, CheckCircle, XCircle } from "lucide-react";
+import api from "../api/api"; // Assuming your api utility is in this path
+import { toast } from "react-hot-toast";
 
-import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, CheckCircle, XCircle } from "lucide-react";
+const CanvasTable = ({ table, isUnavailable, isSelected, onSelect }) => {
+    const baseClasses = "absolute rounded-md w-16 h-16 flex items-center justify-center font-semibold text-white shadow-lg transform transition-all duration-200";
+    const stateClasses = isUnavailable
+        ? 'bg-red-500'
+        : isSelected
+            ? 'bg-green-600 ring-4 ring-green-300 scale-110'
+            : 'bg-gray-500 hover:bg-gray-600 cursor-pointer';
 
-// A simple component for displaying a table
-const TableCard = ({ table, isAvailable, onBook }) => (
-    <div
-        className={`p-4 rounded-lg shadow-md border ${
-            isAvailable 
-                ? 'bg-white border-gray-200' 
-                : 'bg-gray-100 border-gray-300 opacity-60'
-        }`}
-    >
-        <div className="flex justify-between items-center">
-            <h3 className="font-bold text-lg text-gray-800">{table.name}</h3>
-            <div className="flex items-center text-sm text-gray-600">
-                <Users className="w-4 h-4 mr-2" />
-                <span>Capacity: </span>
-            </div>
+    return (
+        <div
+            style={{
+                left: `${table.x_position}px`,
+                top: `${table.y_position}px`,
+            }}
+            className={`${baseClasses} ${stateClasses}`}
+            onClick={() => !isUnavailable && onSelect(table.id)}
+            title={isUnavailable ? `${table.name} (Unavailable)` : `Click to select ${table.name}`}
+        >
+            {table.name}
         </div>
-        <div className="text-sm text-gray-500 mt-2">
-            ID: {table.id} | Shape: 
-        </div>
-        {isAvailable && (
-            <button
-                onClick={() => onBook(table.id)}
-                className="mt-4 w-full px-4 py-2 font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
-            >
-                Book This Table
-            </button>
-        )}
-    </div>
-);
+    );
+};
 
 
 function AvailableTablesPage() {
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedTableId, setSelectedTableId] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
-
-    // Guard clause: If someone lands on this page directly, the state will be null.
-    // In that case, redirect them back to the home page or previous page.
-    if (!location.state) {
-        // You can navigate to a specific fallback route if needed
-        // navigate('/'); 
-        return (
-            <div className="text-center p-8">
-                <h1 className="text-xl font-bold">No data found.</h1>
-                <p>Please start by finding a reservation.</p>
-                <button onClick={() => navigate(-1)}>Go Back</button>
-            </div>
-        );
-    }
+    const { id: restaurantId } = useParams(); 
     
-    // Destructure the data from the location state for easy access
     const { availableTables, unavailableTables, reservationDetails } = location.state;
+    const handleSelectTable = (tableId) => {
+        setSelectedTableId(prevSelectedId => prevSelectedId === tableId ? null : tableId);
+    };
 
-    const handleBookTable = (tableId) => {
-        // Here you would implement the final booking logic
-        console.log("Booking table ID:", tableId);
-        console.log("With reservation details:", reservationDetails);
-        alert(`Booking functionality for table ${tableId} would be implemented here!`);
-        // Example: navigate('/confirm-booking', { state: { tableId, reservationDetails } });
+    const handleFinalizeReservation = async () => {
+        if (!selectedTableId) {
+            toast.error("Please select a table first.");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const reservationData = {
+                ...reservationDetails, 
+                table_id: selectedTableId,
+                restaurant_id: restaurantId,
+            };
+            
+            const response = await api.post(`/reservations`, reservationData);
+
+            if (response.status === 200 || response.status === 201) {
+                toast.success("Reservation successful!");
+                navigate('/confirm-booking', { state: { reservationDetails: response.data } });
+            } else {
+                toast.error(response.data.message || "Failed to make reservation.");
+            }
+        } catch (error) {
+            console.error("Error making reservation:", error);
+            const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
+            toast.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <div className="bg-gray-50 min-h-screen">
-            <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-                {/* --- Header with Back Button --- */}
-                <div className="flex items-center mb-6">
+            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col h-screen">
+                <header className="flex-shrink-0">
+                    <div className="flex items-center mb-6">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="p-2 mr-4 text-gray-600 bg-white rounded-full hover:bg-gray-100 border border-gray-200 transition-colors"
+                            aria-label="Go back"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <h1 className="text-2xl font-bold text-gray-800">
+                            Select a Table
+                        </h1>
+                    </div>
+                </header>
+
+                <main className="flex-grow bg-white border border-gray-200 rounded-lg shadow-inner overflow-hidden relative p-4">
+                    <div className="w-full h-full relative"> 
+                        {availableTables.map((table) => (
+                            <CanvasTable
+                                key={table.id}
+                                table={table}
+                                isUnavailable={false}
+                                isSelected={selectedTableId === table.id}
+                                onSelect={handleSelectTable}
+                            />
+                        ))}
+                        {unavailableTables.map((table) => (
+                            <CanvasTable
+                                key={table.id}
+                                table={table}
+                                isUnavailable={true}
+                            />
+                        ))}
+                    </div>
+                     <div className="absolute bottom-4 right-4 bg-white bg-opacity-80 p-3 rounded-lg border text-sm">
+                        <h4 className="font-bold mb-2">Legend</h4>
+                        <div className="flex items-center mb-1"><div className="w-4 h-4 rounded-full bg-gray-500 mr-2"></div><span>Available</span></div>
+                        <div className="flex items-center mb-1"><div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div><span>Unavailable</span></div>
+                        <div className="flex items-center"><div className="w-4 h-4 rounded-full bg-green-600 ring-2 ring-green-300 mr-2"></div><span>Selected</span></div>
+                    </div>
+                </main>
+
+
+                <footer className="flex-shrink-0 pt-6">
                     <button
-                        onClick={() => navigate(-1)}
-                        className="p-2 mr-4 text-gray-600 bg-white rounded-full hover:bg-gray-100 border border-gray-200 transition-colors"
-                        aria-label="Go back"
+                        onClick={handleFinalizeReservation}
+                        disabled={!selectedTableId || isLoading}
+                        className="w-full px-6 py-3 font-semibold text-lg text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
                     >
-                        <ArrowLeft className="w-5 h-5" />
+                        {isLoading ? 'Processing...' : 'Finalize Reservation'}
                     </button>
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        Available Tables
-                    </h1>
-                </div>
-
-                {/* --- Available Tables Section --- */}
-                <div className="mb-8">
-                    <div className="flex items-center mb-4">
-                        <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                        <h2 className="text-xl font-semibold text-gray-700">Found {availableTables.length} available table(s)</h2>
-                    </div>
-                    {availableTables.length > 0 ? (
-                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {availableTables.map((table) => (
-                                <TableCard key={table.id} table={table} isAvailable={true} onBook={handleBookTable} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center p-8 bg-white rounded-lg border">
-                            <p className="text-gray-600">No tables are available that match your exact criteria.</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* --- Unavailable Tables Section --- */}
-                {unavailableTables.length > 0 && (
-                     <div className="mb-8">
-                        <div className="flex items-center mb-4">
-                            <XCircle className="w-6 h-6 text-red-600 mr-3" />
-                            <h2 className="text-xl font-semibold text-gray-700">Unavailable due to booking conflicts</h2>
-                        </div>
-                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {unavailableTables.map((table) => (
-                                <TableCard key={table.id} table={table} isAvailable={false} />
-                            ))}
-                        </div>
-                    </div>
-                )}
+                </footer>
             </div>
         </div>
     );

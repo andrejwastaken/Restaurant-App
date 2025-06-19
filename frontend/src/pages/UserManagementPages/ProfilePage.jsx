@@ -110,7 +110,7 @@ const ProfilePage = () => {
       setActiveModal(modalType);
       setInitialDataForModal(data);
     } else {
-      console.log("Error");
+      console.error("Error");
     }
   };
 

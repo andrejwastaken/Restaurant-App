@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Loading from "../components/Loading";
 import { useAuth } from "../contexts/AuthContext";
+import { ArrowLeft } from "lucide-react";
 
 const InfoIcon = ({ children }) => (
 	<svg
@@ -19,6 +21,7 @@ const InfoIcon = ({ children }) => (
 
 function RestaurantDetailPage() {
 	const { id } = useParams();
+	const navigate = useNavigate();
 	const [restaurant, setRestaurant] = useState(null);
 	const [isLoading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -62,7 +65,14 @@ function RestaurantDetailPage() {
 					</div>
 				) : (
 					<div className="w-full max-w-2xl bg-white rounded-lg shadow-xl p-8 transform transition-all hover:scale-[1.01]">
-						{/* Restaurant Name */}
+						<button
+							onClick={() => navigate(-1)}
+							className="p-2 mr-4 text-gray-600 bg-white rounded-full hover:bg-gray-100 border border-gray-200 transition-colors"
+							aria-label="Go back"
+						>
+							<ArrowLeft className="w-5 h-5" />
+						</button>
+
 						<h1 className="text-4xl font-extrabold text-gray-800 text-center mb-4">
 							{restaurant.name}
 						</h1>
@@ -72,7 +82,6 @@ function RestaurantDetailPage() {
 							{restaurant.description}
 						</p>
 
-						{/* Details Section */}
 						{/* Details Section */}
 						<div className="space-y-4 border-t border-gray-200 pt-6">
 							<div className="flex items-center">
@@ -122,7 +131,7 @@ function RestaurantDetailPage() {
 								</Link>
 							) : (
 								<Link
-									to="/login" 
+									to="/login"
 									className="inline-block w-full max-w-xs px-8 py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
 								>
 									Log in to see availability.

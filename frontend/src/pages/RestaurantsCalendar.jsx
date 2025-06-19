@@ -142,7 +142,7 @@ function RestaurantsCalendar() {
 		const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
 		const days = [];
 		for (let i = 0; i < firstDay; i++) {
-			days.push(<div key={`empty-${i}`} className="w-8 h-8"></div>);
+			days.push(<div key={`empty-${i}`} className="w-8 h-8 p-2"></div>);
 		}
 		for (let day = 1; day <= daysInMonth; day++) {
 			const date = new Date(currentYear, currentMonth, day);
@@ -214,7 +214,7 @@ function RestaurantsCalendar() {
 						{daysOfWeek.map((day) => (
 							<div
 								key={day}
-								className="text-center text-sm font-medium text-gray-600 py-2"
+								className="ml-1 text-sm font-medium text-gray-600 py-2"
 							>
 								{day}
 							</div>
@@ -303,7 +303,7 @@ function RestaurantsCalendar() {
 											Your Selection
 										</p>
 										<p className="text-amber-800 text-sm">
-											{selectedDate.toLocaleDateString()}
+											{selectedDate.toLocaleDateString('en-GB')}
 											{selectedTimeSlot
 												? ` at ${selectedTimeSlot}`
 												: " - Select a time"}

@@ -94,7 +94,7 @@ function Navbar() {
               </a>
               {isLoggedIn ? (
                 <Link
-                  to="/user/reservation-history"
+                  to="/user/your-reservations"
                   className="flex items-center text-gray-600 hover:text-amber-500 hover:bg-amber-50 px-3 py-2 rounded-md text-sm font-medium transition-all"
                 >
                   Your Reservations

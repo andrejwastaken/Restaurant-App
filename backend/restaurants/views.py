@@ -254,6 +254,7 @@ class RestaurantAvailabilityAPIView(APIView):
             day_int = int(day)
         except (TypeError, ValueError):
             return Response({'error': 'Invalid day parameter.'}, status=status.HTTP_400_BAD_REQUEST)
+        day_int -= 1 # Convert to 0-6 range (Monday=0, Sunday=6)
         operation_hours_for_restaurant = get_object_or_404(OperationHours, setup=setup, day_of_week=day_int)
         # Validate input
         if not time or not party_size:

@@ -17,8 +17,8 @@ function ProfileOwnedRestaurantEditViewFormBasicView({ onSave, onReturn }) {
           address: "",
           phone_number: "",
           default_reservation_slot_duration: "",
-          latitude: 0,
-          longitude: 0,
+          latitude: 41.9981, // Default to Skopje's center
+          longitude: 21.4254,
         }
   );
 
