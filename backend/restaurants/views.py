@@ -5,12 +5,13 @@ from rest_framework.response import Response
 from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay
 from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer, \
     OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer, TableSerializer, SpecialDaySerializer
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
-from datetime import timedelta
+from reservations.models import Reservation
+from django.db.models import F, ExpressionWrapper, DateTimeField
 
 class RestaurantListDetailAPIView(APIView):
     def get(self, request, pk=None):
@@ -240,56 +241,76 @@ class ReverseGeocodeView(APIView):
             )        
         
 class RestaurantAvailabilityAPIView(APIView):
+    """
+    Checks table availability, now including conflicts with existing reservations.
+    """
     permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, restaurant_id):
-        date = request.query_params.get('date')
-        day = request.query_params.get('day')
-        time = request.query_params.get('time')
-        party_size = request.query_params.get('party_size')
-        is_smoker = request.query_params.get('is_smoker')
-        is_smoker = True if is_smoker == 'true' else False
+        date_str = request.query_params.get('date')
+        time_str = request.query_params.get('time') 
+        party_size_str = request.query_params.get('party_size')
+        duration_str = request.query_params.get('duration', '120') 
+        is_smoker_str = request.query_params.get('is_smoker', 'false')
+
+        if not all([date_str, time_str, party_size_str]):
+            return Response({'error': 'Missing required parameters: date, time, party_size'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            start_time = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+            duration = timedelta(minutes=int(duration_str))
+            end_time = start_time + duration
+            party_size = int(party_size_str)
+            is_smoker = True if is_smoker_str.lower() == 'true' else False
+        except (ValueError, TypeError):
+            return Response({'error': 'Invalid format for parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
         restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
         setup = get_object_or_404(RestaurantSetup, restaurant=restaurant)
-        try:
-            day_int = int(day)
-        except (TypeError, ValueError):
-            return Response({'error': 'Invalid day parameter.'}, status=status.HTTP_400_BAD_REQUEST)
-        day_int -= 1 # Convert to 0-6 range (Monday=0, Sunday=6)
-        operation_hours_for_restaurant = get_object_or_404(OperationHours, setup=setup, day_of_week=day_int)
-        # Validate input
-        if not time or not party_size:
-            return Response({'error': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+        day_of_week = start_time.weekday() # Monday=0, Sunday=6
 
         try:
-            party_size = int(party_size)
-        except ValueError:
-            return Response({'error': 'Invalid party_size.'}, status=status.HTTP_400_BAD_REQUEST)
+            op_hours = OperationHours.objects.get(setup=setup, day_of_week=day_of_week)
+            if not (op_hours.open_time <= start_time.time() and end_time.time() <= op_hours.close_time):
+                 return Response({'error': 'Requested time is outside operational hours.'}, status=status.HTTP_400_BAD_REQUEST)
+        except OperationHours.DoesNotExist:
+            return Response({'error': 'The restaurant is not open on the selected day.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            dt = datetime.strptime(time, "%H:%M")
-        except ValueError:
-            return Response({'error': 'Invalid time format. Use ISO format.'}, status=status.HTTP_400_BAD_REQUEST)
+        existing_end_time_expression = ExpressionWrapper(F('start_time') + F('duration'), output_field=DateTimeField())
 
-        opening = operation_hours_for_restaurant.open_time
-        closing = operation_hours_for_restaurant.close_time
-
-        duration = int(request.query_params.get('duration', 120))
-        end_time = (dt + timedelta(minutes=duration)).time()
-        if not (opening <= dt.time() < closing and opening < end_time <= closing):
-            return Response({'error': 'Requested time is outside operational hours.'}, status=status.HTTP_400_BAD_REQUEST)
-        table_types = TableType.objects.filter(setup=setup, capacity__gte=party_size)
-        tables = Table.objects.filter(
-            setup=setup,
-            is_smoking=is_smoker,
-            table_type__in=table_types
+        conflicting_reservations = Reservation.objects.filter(
+            table__setup__restaurant_id=restaurant_id,
+            status='CONFIRMED'
+        ).annotate(
+            end_time=existing_end_time_expression
+        ).filter(
+            start_time__lt=end_time,  
+            end_time__gt=start_time  
         )
-        unavailable = Table.objects.filter(setup=setup).exclude(is_smoking=is_smoker,
-            table_type__in=table_types)
-        unavailable_serializer = TableSerializer(unavailable, many=True)
-        table_serializer = TableSerializer(tables, many=True)
+
+        booked_table_ids = set(conflicting_reservations.values_list('table_id', flat=True))
+
+        all_restaurant_tables = Table.objects.filter(setup=setup).select_related('table_type')
+        
+        available_tables = []
+        unavailable_tables = []
+
+        for table in all_restaurant_tables:
+            # A table is available if it meets all criteria:
+            is_not_booked = table.id not in booked_table_ids
+            has_enough_capacity = table.table_type.capacity >= party_size
+            matches_smoking_pref = table.is_smoking == is_smoker
+
+            if is_not_booked and has_enough_capacity and matches_smoking_pref:
+                available_tables.append(table)
+            else:
+                unavailable_tables.append(table)
+
+        available_serializer = TableSerializer(available_tables, many=True)
+        unavailable_serializer = TableSerializer(unavailable_tables, many=True)
 
         return Response({
-            'tables': table_serializer.data,
+            'tables': available_serializer.data,
             'unavailable': unavailable_serializer.data,
         }, status=status.HTTP_200_OK)
 

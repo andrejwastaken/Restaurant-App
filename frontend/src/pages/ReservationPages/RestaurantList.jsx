@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import amberIcon from "../assets/amberIcon";
-import Navbar from "../components/Navbar";
-import SearchBar from "../components/SearchBar";
-import Footer from "../components/Footer";
-import Loading from "../components/Loading";
-import RestaurantCard from "../components/RestaurantCard";
+import amberIcon from "../../assets/amberIcon";
+import Navbar from "../../components/Navbar";
+import SearchBar from "../../components/SearchBar";
+import Footer from "../../components/Footer";
+import Loading from "../../components/Loading";
+import RestaurantCard from "../../components/RestaurantCard";
 
 // A helper component to move the map when a search result is found
 function FlyToMarker({ position }) {
@@ -60,7 +60,7 @@ function RestaurantList() {
 				setLoading(false);
 			});
 	}, []);
-	
+
 	// This computed value will filter restaurants based on the search query
 	const skopjeCenter = [41.9981, 21.4254];
 	useEffect(() => {
@@ -92,8 +92,13 @@ function RestaurantList() {
 	return (
 		<div className="flex flex-col min-h-screen bg-gray-50">
 			<Navbar />
-			<SearchBar query={query} setQuery={setQuery} isListSelected={isListSelected} setListSelected={setListSelected}/>
-			
+			<SearchBar
+				query={query}
+				setQuery={setQuery}
+				isListSelected={isListSelected}
+				setListSelected={setListSelected}
+			/>
+
 			{!isListSelected ? (
 				<main className="flex-grow relative">
 					{isLoading ? (

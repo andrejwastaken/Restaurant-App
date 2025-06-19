@@ -8,8 +8,10 @@ import {
 	Calendar,
 	Search,
 } from "lucide-react";
-import api from "../api/api";
+import api from "../../api/api";
 import { toast } from "react-hot-toast";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 const InfoSection = ({ icon, title, children }) => (
 	<div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -90,6 +92,7 @@ function ReservationDetailsPage() {
 			is_smoker: isSmoker,
 			duration: Number(duration),
 			day: day,
+			date: selectedDate.toISOString().split("T")[0],
 		};
 
 		try {
@@ -99,12 +102,12 @@ function ReservationDetailsPage() {
 			);
 			console.log(response.data);
 			navigate(`/available-tables/${id}`, {
-                state: {
-                    availableTables: response.data.tables, 
-                    unavailableTables: response.data.unavailable, 
-                    reservationDetails: params 
-                }
-            });
+				state: {
+					availableTables: response.data.tables,
+					unavailableTables: response.data.unavailable,
+					reservationDetails: params,
+				},
+			});
 		} catch (error) {
 			console.error("Finding tables failed", error);
 			toast.error("No tables found.");
@@ -116,7 +119,7 @@ function ReservationDetailsPage() {
 			isSmoker,
 			duration: Number(duration),
 			restaurantId: location.state.restaurantId,
-			day: day
+			day: day,
 		});
 	};
 
@@ -144,6 +147,7 @@ function ReservationDetailsPage() {
 	}
 	return (
 		<div className="bg-gray-50 min-h-screen">
+			<Navbar />
 			<div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
 				{/* --- Header with Back Button --- */}
 				<div className="flex items-center mb-6">
@@ -249,6 +253,7 @@ function ReservationDetailsPage() {
 					</button>
 				</div>
 			</div>
+			<Footer />
 		</div>
 	);
 }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams, Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import Loading from "../components/Loading";
-import { useAuth } from "../contexts/AuthContext";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
+import Loading from "../../components/Loading";
+import { useAuth } from "../../contexts/AuthContext";
 import { ArrowLeft } from "lucide-react";
 
 const InfoIcon = ({ children }) => (

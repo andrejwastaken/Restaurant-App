@@ -1,46 +1,73 @@
 from django.db import models
+from django.db.models import F
+from django.db.models.fields import DateTimeField
 from users.models import User
-from restaurants.models import Restaurant
+from restaurants.models import Table
 from clients.models import ClientProfile
-
-# Create your models here.
+from django.core.exceptions import ValidationError
+from django.db.models import ExpressionWrapper
 class Reservation(models.Model):
     STATUS_CHOICES = (
-        ('PENDING', 'pending'),
         ('CONFIRMED', 'confirmed'),
-        ('BLOCKED', 'blocked'),
+        ('CANCELLED', 'cancelled'),
+    )  
+
+    client = models.ForeignKey(ClientProfile, on_delete=models.CASCADE, related_name='reservations')
+    table = models.ForeignKey(Table, on_delete= models.CASCADE, related_name='reservations', help_text="The table being reserved")
+    start_time = models.DateTimeField(
+        help_text="The date and time the reservation starts."
+    )
+    duration = models.DurationField(
+        help_text="The duration of the reservation (e.g., 2 hours)."
     )
 
-    # This directly links a booking to a specific, available slot from the inventory.
-    # The TimeSlot is now the single source of truth. 
-    # A TimeSlot can only ever belong to one RestaurantSetup, which belongs to one Restaurant. 
-    # By linking the Reservation to the TimeSlot, it automatically and reliably inherits the correct restaurant. 
-
-    # time_slot = models.ForeignKey(
-    #     TimeSlot,
-    #     on_delete=models.CASCADE, # When a TimeSlot is deleted, reservations for it are also deleted.
-    #     related_name='reservations'
-    # )
-    client = models.ForeignKey(ClientProfile, on_delete=models.CASCADE)
-    number_of_guests = models.PositiveIntegerField(
-        help_text="How many guests are attending (must be less than or equal to the table's capacity)."
-    )
-    
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
-    comment = models.TextField(blank=True, null=True)
-
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='CONFIRMED')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def end_time(self):
+        """Calculates the reservation end time. This is a property, not a database field."""
+        if self.start_time and self.duration:
+            return self.start_time + self.duration
+        return None
+
     def clean(self):
-        # Add validation logic here.
-        if self.number_of_guests > self.time_slot.table_type.capacity:
-            raise models.ValidationError(
-                f"The number of guests ({self.number_of_guests}) exceeds the capacity of the selected table"
-                f"({self.time_slot.table_type.capacity})."
+        # The logic for an overlapping reservation is:
+        # (New Start < Existing End) AND (New End > Existing Start)
+        
+        if self.start_time and self.duration:
+            new_reservation_end_time = self.start_time + self.duration
+
+            # Create a reusable expression for calculating the end time in the database
+            existing_end_time_expression = ExpressionWrapper(
+                F('start_time') + F('duration'), 
+                output_field=DateTimeField()
             )
 
-    def __str__(self):
-        return (f"Booking for {self.client} at {self.time_slot.setup.restaurant.name} "
-                f"({self.time_slot.table_type.name}) on {self.time_slot.date} at {self.time_slot.time}")
+            # Find conflicting reservations using the CORRECT annotate-then-filter pattern
+            conflicting_reservations = Reservation.objects.filter(
+                table=self.table,
+                status='CONFIRMED'
+            ).exclude(pk=self.pk).annotate(
+                # First, create the 'end_time' field for each existing reservation
+                end_time=existing_end_time_expression
+            ).filter(
+                # Now, filter using the simple overlap logic
+                start_time__lt=new_reservation_end_time,  # Existing start < New end
+                end_time__gt=self.start_time              # Existing end > New start
+            )
+            
+            if conflicting_reservations.exists():
+                raise ValidationError(
+                    "This table is already booked for the selected time slot."
+                )
 
+    def __str__(self):
+        return (f"Reservation for {self.client.user.username} at table '{self.table.name}' "
+                f"in {self.table.setup.restaurant.name} on {self.start_time.strftime('%Y-%m-%d %H:%M')}")
+
+    class Meta:
+        ordering = ['start_time']
+        verbose_name = "Reservation"
+        verbose_name_plural = "Reservations"

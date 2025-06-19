@@ -1,66 +1,68 @@
+from datetime import datetime, date, time, timedelta
 from django.db import transaction
-from .models import Reservation
+from .models import Reservation, Table, ClientProfile
 from django.core.exceptions import ValidationError
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from restaurants.serializers import TableSerializer
+class ReservationCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
-@transaction.atomic # Ensure that all operations are atomic (all or nothing)
-# def create_reservation(request_data):
-#     time_slot_id = request_data.get('time_slot_id')
-#     client_profile = request_data.get('client')
-#     num_guests = request_data.get('number_of_guests')
-#
-#     if not time_slot_id or not client_profile or not num_guests:
-#         raise ValueError("Missing required fields: time_slot_id, client, or number_of_guests")
-#
-#     try:
-#         slot_to_book = TimeSlot.objects.select_for_update().get(id=time_slot_id)
-#     except TimeSlot.DoesNotExist:
-#         raise ValueError("Time slot does not exist")
-#
-#     if slot_to_book.quantity_available <= 0:
-#         raise ValueError("No available slots for this time slot.")
-#
-#     if num_guests > slot_to_book.table_type.capacity:
-#         raise ValueError(f"Number of guests ({num_guests}) exceeds the capacity of the selected table ({slot_to_book.table_type.capacity}).")
-#
-#
-#     new_reservation = Reservation.objects.create(
-#         time_slot=slot_to_book,
-#         client=client_profile,
-#         number_of_guests=num_guests,
-#         comment=request_data.get('comment', ''),
-#         )
-#
-#     slot_to_book.quantity_available -= 1
-#     slot_to_book.save()
-#
-#     return new_reservation
+    def post(self, request, *args, **kwargs):
+        # The 'with transaction.atomic()' block ensures that all database
+        # operations within it are either all committed or all rolled back.
+        try:
+            with transaction.atomic():
+                date_str = request.data.get("date")
+                table_id = request.data.get("table_id")
+                start_time_str = request.data.get("start_time")
+                duration_str = request.data.get("duration")
+                client_id = request.user.id  
+                if not all([table_id, start_time_str, duration_str, client_id]):
+                    raise ValidationError("Missing required fields. Required: table_id, start_time, duration, number_of_guests. client_id")
+                client_profile = ClientProfile.objects.get(user_id=client_id)
+                try:
+                    full_datetime_str = f"{date_str} {start_time_str}"
+                    datetime_format = "%Y-%m-%d %H:%M"
+                    start_time_obj = datetime.strptime(full_datetime_str, datetime_format)                    
+                    duration_obj = timedelta(minutes=int(duration_str))
+                except (TypeError, ValueError):
+                    raise ValidationError("Invalid format for start_time, duration")
 
-def update_reservation(reservation_id, user_id, request_data):
-    try:
-        reservation = Reservation.objects.get(id=reservation_id, client__user_id=user_id)
-    except Reservation.DoesNotExist:
-        raise ValueError("Reservation does not exist")
+                # Fetch the table and lock the row for the duration of the transaction
+                # to prevent race conditions from other simultaneous requests.
+                table_to_book = Table.objects.select_for_update().get(id=table_id)
+                new_reservation = Reservation(
+                    table=table_to_book,
+                    client=client_profile,
+                    start_time=start_time_obj,
+                    duration=duration_obj,
+                )
 
-    # Get the proposed new number of guests from the request. If not provided, it defaults to the current number.
-    new_guest_count = request_data.get('number_of_guests', reservation.number_of_guests)
+                new_reservation.full_clean()
 
-    # Check if the new guest count is valid for the booked table type.
-    if new_guest_count > reservation.time_slot.table_type.capacity:
-        raise ValueError(
-            f"The new number of guests ({new_guest_count}) exceeds the capacity "
-            f"of the selected table ({reservation.time_slot.table_type.capacity})."
-        )
-    
-    reservation.number_of_guests = new_guest_count
-    reservation.comment = request_data.get('comment', reservation.comment)
-    
-    try:
-        reservation.full_clean()
-    except ValidationError as e:
-        raise ValueError(f"Invalid data: {e}")
+                new_reservation.save()
 
-    reservation.save()
-    return reservation
+                success_response = {
+                    "message": "Reservation confirmed successfully!",
+                }
+                return Response(success_response, status=status.HTTP_201_CREATED)
+
+        except Table.DoesNotExist:
+            return Response({"success": False, "error": "The selected table does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        except ClientProfile.DoesNotExist:
+             return Response({"success": False, "error": "No valid client profile found for the logged-in user."}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({"success": False, "error": e.messages[0]}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            print(f"Unexpected error during reservation creation: {e}")
+            return Response(
+                {"success": False, "error": "An unexpected server error occurred."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 @transaction.atomic # Ensure that all operations are atomic (all or nothing)
 def cancel_reservation(reservation_id, client_id):
