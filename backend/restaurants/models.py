@@ -147,7 +147,7 @@ class SpecialDay(models.Model):
     setup = models.ForeignKey(
         RestaurantSetup,
         on_delete=models.CASCADE,
-        related_name='special_day',
+        related_name='special_days',
         help_text="The restaurant setup this Special Day belongs to."
     )
 

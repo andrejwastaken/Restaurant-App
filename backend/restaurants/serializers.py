@@ -74,6 +74,25 @@ class TableSerializer(serializers.ModelSerializer):
 
         return data
 
+class SpecialDaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecialDay
+        fields = ['id', 'day', 'open_time', 'close_time', 'description']
+        read_only_fields = ['id']
+
+    def validate_day(self, value):
+        setup = self.context['setup']
+
+        if SpecialDay.objects.filter(setup=setup, day=value).exists():
+            raise serializers.ValidationError("Special Day already exists")
+
+        return value
+
+    def create(self, validated_data):
+        setup = self.context['setup']
+
+        return SpecialDay.objects.create(setup=setup, **validated_data)
+
 class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):
     """
     This serializer accepts all data needed to create a restaurant and its
@@ -203,10 +222,11 @@ class RestaurantSetupDetailSerializer(serializers.ModelSerializer):
     operating_hours = OperatingHoursDetailSerializer(many=True, read_only=True)
     table_types = TableTypeDetailSerializer(many=True, read_only=True)
     tables = TableDetailSerializer(many=True, read_only=True)
+    special_days = SpecialDaySerializer(many=True, read_only=True)
 
     class Meta:
         model = RestaurantSetup
-        fields = ['id', 'default_slot_duration', 'operating_hours', 'table_types', 'tables']
+        fields = ['id', 'default_slot_duration', 'operating_hours', 'table_types', 'tables', 'special_days']
 
 class OwnedRestaurantDetailSerializer(serializers.ModelSerializer):
     setup = RestaurantSetupDetailSerializer(read_only=True)
@@ -266,25 +286,7 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
 
         return instance
 
-class SpecialDaySerializer(serializers.ModelSerializer):
-    setup = RestaurantSetupDetailSerializer(read_only=True)
 
-    class Meta:
-        model = SpecialDay
-        fields = ['day', 'open_time', 'close_time', 'description']
-
-    def validate_day(self, value):
-        setup = self.context['setup']
-
-        if SpecialDay.objects.filter(setup=setup, day=value).exists():
-            raise serializers.ValidationError("Special Day already exists")
-
-        return value
-
-    def create(self, validated_data):
-        setup = self.context['setup']
-
-        return SpecialDay.objects.create(setup=setup, **validated_data)
 
 
 

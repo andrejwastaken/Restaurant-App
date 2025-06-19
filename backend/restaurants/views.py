@@ -327,7 +327,7 @@ class SpecialDayAddAPIView(APIView):
 
         serializer = SpecialDaySerializer(
             data=request.data,
-            context={'setup': setup}
+            context={'setup': setup }
         )
 
         if serializer.is_valid():
@@ -352,4 +352,24 @@ class SpecialDayGetAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class SpecialDayDeleteAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, restaurant_id, special_day_id, *args, **kwargs):
+        """
+        Handles DELETE requests to delete a specific SpecialDay.
+        """
+        # Manually perform the security check and get the object
+        special_day = get_object_or_404(
+            SpecialDay,
+            id=special_day_id,
+            setup__restaurant__id=restaurant_id,
+            setup__restaurant__owner=request.user
+        )
+
+        # Delete the object
+        special_day.delete()
+
+        # Return a success response. HTTP 204 means "No Content" and is standard for successful deletes.
+        return Response({"message": "Special day deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
         

@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, Outlet } from "react-router-dom";
+import { useProfileData } from "../contexts/ProfileDataContext";
 
 import api from "../api/api";
-// import RestaurantUpdateContext from "../contexts/RestaurantUpdateContext";
 import Loading from "./Loading";
 import ProfileOwnedRestaurantsList from "./ProfileOwnedRestaurantsList";
-import { useProfileData } from "../contexts/ProfileDataContext";
 
 function ProfileOwnedRestaurants() {
   const [restaurants, setRestaurants] = useState({});

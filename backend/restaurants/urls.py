@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import RestaurantListDetailAPIView, CreateRestaurantView, OwnedRestaurantsListView, \
     SetupRestaurantTablesView, OwnedRestaurantDetailView, UpdateRestaurantView, SpecialDayAddAPIView, \
-    SpecialDayGetAPIView
+    SpecialDayGetAPIView, SpecialDayDeleteAPIView
 from .views import RestaurantListDetailAPIView, CreateRestaurantView, OwnedRestaurantsListView, \
     SetupRestaurantTablesView, GeocodeView, ReverseGeocodeView, RestaurantAvailabilityAPIView
 
@@ -24,6 +24,7 @@ urlpatterns = [
 
     path('owned-restaurant/<int:restaurant_id>/add-special-day/', SpecialDayAddAPIView.as_view(), name='add-special-day'),
     path('owned-restaurant/<int:restaurant_id>/get-special-days/', SpecialDayGetAPIView.as_view(), name='get-special-days'),
+    path('owned-restaurant/<int:restaurant_id>/special-day/<int:special_day_id>/delete/', SpecialDayDeleteAPIView.as_view(), name='special-day-delete'),
 
 
     path('geocode/', GeocodeView.as_view(), name='geocode-restaurant'),
