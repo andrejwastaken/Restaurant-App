@@ -142,3 +142,21 @@ class OperationHours(models.Model):
         return (f'{self.get_day_of_week_display()}: '
                 f'{self.open_time.strftime("%H:%M")} - '
                 f'{self.close_time.strftime("%H:%M")}')
+
+class SpecialDay:
+    setup = models.ForeignKey(
+        RestaurantSetup,
+        on_delete=models.CASCADE,
+        related_name='special_day',
+        help_text="The restaurant setup this Special Day belongs to."
+    )
+
+    day = models.DateField()
+
+    open_time = models.TimeField()
+    close_time = models.TimeField()
+
+    description = models.CharField(max_length=300)
+
+    def __str__(self):
+        return f'{self.day} {self.open_time} {self.close_time}'

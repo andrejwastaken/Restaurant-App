@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.db import transaction
-from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours
+from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay
+
 
 class OperatingHoursNestedSerializer(serializers.ModelSerializer):
     def validate(self, data):
@@ -264,6 +265,26 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
             TableType.objects.bulk_create(types_to_create)  # Create all new types
 
         return instance
+
+class SpecialDaySerializer(serializers.ModelSerializer):
+    setup = RestaurantSetupDetailSerializer(read_only=True)
+
+    class Meta:
+        model = SpecialDay
+        fields = ['day', 'open_time', 'close_time', 'description']
+
+    def validate_day(self, value):
+        setup = self.context['setup']
+
+        if SpecialDay.objects.filter(setup=setup, day=value).exists():
+            raise serializers.ValidationError("Special Day already exists")
+
+        return value
+
+    def create(self, validated_data):
+        setup = self.context['setup']
+
+        return SpecialDay.objects.create(setup=setup, **validated_data)
 
 
 

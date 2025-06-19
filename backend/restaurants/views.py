@@ -2,9 +2,9 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours
+from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay
 from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer, \
-    OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer, TableSerializer
+    OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer, TableSerializer, SpecialDaySerializer
 from datetime import datetime
 from collections import defaultdict
 from django.shortcuts import get_object_or_404
@@ -291,4 +291,43 @@ class RestaurantAvailabilityAPIView(APIView):
             'tables': table_serializer.data,
             'unavailable': unavailable_serializer.data,
         }, status=status.HTTP_200_OK)
+
+class SpecialDayAddAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, restaurant_id):
+        restaurant = get_object_or_404(Restaurant, pk=restaurant_id, owner=request.user)
+
+        setup = restaurant.setup
+
+        if not setup:
+            return Response({"error": "Restaurant not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = SpecialDaySerializer(
+            data=request.data,
+            context={'setup': setup}
+        )
+
+        if serializer.is_valid():
+            serializer.save()  # This calls the .update() method in the serializer
+            return Response({"message": "Special day added successfully."}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SpecialDayGetAPIView(APIView):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def get(self, restaurant_id):
+        restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
+        setup = restaurant.setup
+
+        if not setup:
+            return Response({"error": "Restaurant not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        special_days = SpecialDay.objects.filter(setup=setup)
+
+        serializer = SpecialDaySerializer(special_days, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
         
