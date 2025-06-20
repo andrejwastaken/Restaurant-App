@@ -1,6 +1,6 @@
 from datetime import datetime, date, time, timedelta
 from django.db import transaction
-
+from django.utils import timezone 
 from .serializers import ReservationListSerializer
 from restaurants.models import Restaurant
 from .models import Reservation, Table, ClientProfile
@@ -30,7 +30,8 @@ class ReservationCreateAPIView(APIView):
                 try:
                     full_datetime_str = f"{date_str} {start_time_str}"
                     datetime_format = "%Y-%m-%d %H:%M"
-                    start_time_obj = datetime.strptime(full_datetime_str, datetime_format)                    
+                    naive_start_time = datetime.strptime(full_datetime_str, datetime_format)
+                    aware_start_time = timezone.make_aware(naive_start_time, timezone.get_current_timezone())                    
                     duration_obj = timedelta(minutes=int(duration_str))
                 except (TypeError, ValueError):
                     raise ValidationError("Invalid format for start_time, duration")
@@ -41,7 +42,7 @@ class ReservationCreateAPIView(APIView):
                 new_reservation = Reservation(
                     table=table_to_book,
                     client=client_profile,
-                    start_time=start_time_obj,
+                    start_time=aware_start_time,
                     duration=duration_obj,
                 )
 

@@ -1,109 +1,30 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function RestaurantCard({ restaurant }) {
-  const [showModal, setShowModal] = useState(false);
-  const restaurantSetup = restaurant.restaurant_setup;
-
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
-
   return (
-    <>
-      <div className="border rounded-lg shadow p-4">
-        <h2 className="text-xl font-bold">{restaurant.name}</h2>
-        <p>{restaurant.description}</p>
-        <div className="flex justify-end  mt-2">
+    <div className="group relative bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      <div className="relative p-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-amber-600 transition-colors duration-200">
+            {restaurant.name}
+          </h2>
+          <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+            {restaurant.description}
+          </p>
+        </div>
+        <div className="flex justify-end">
           <Link
             to={`/restaurants/${restaurant.id}`}
             state={{ restaurant }}
-            className="mt-2 bg-amber-500 text-white py-1 px-4 rounded hover:bg-amber-600"
+            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-2.5 px-6 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
           >
-            View details.
+            Book Now
           </Link>
         </div>
       </div>
-
-      {showModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={closeModal}
-        >
-          <div
-            className="bg-white p-6 rounded-lg max-w-lg w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="mb-4 px-3 py-1 bg-red-500 text-white rounded"
-              onClick={closeModal}
-            >
-              Close
-            </button>
-
-            {restaurantSetup ? (
-              <div>
-                <p>
-                  <strong>Total Tables:</strong>{" "}
-                  {restaurantSetup.num_tables ?? "N/A"}
-                </p>
-                <p>
-                  <strong>Smoking Tables:</strong>{" "}
-                  {restaurantSetup.num_tables_smoking ?? "N/A"}
-                </p>
-
-                <p>
-                  <strong>Tables by Size:</strong>
-                </p>
-                <ul className="list-disc ml-5">
-                  {restaurantSetup.tables_by_size &&
-                  restaurantSetup.tables_by_size.length > 0 ? (
-                    restaurantSetup.tables_by_size.map((table, idx) => (
-                      <li key={idx}>
-                        Seats: <strong>{table.size}</strong> - Count:{" "}
-                        <strong>{table.count}</strong>
-                      </li>
-                    ))
-                  ) : (
-                    <li>N/A</li>
-                  )}
-                </ul>
-
-                <p>
-                  <strong>Time Slots by Day:</strong>
-                </p>
-                <ul className="list-disc ml-5">
-                  {[
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday",
-                    "Saturday",
-                    "Sunday",
-                  ].map((day) => {
-                    const slots = restaurantSetup.timeslots_by_day?.[day] || [];
-                    return (
-                      <li key={day}>
-                        <strong>{day}:</strong>{" "}
-                        {slots.length > 0
-                          ? slots.map((slot, i) => (
-                              <span key={i}>
-                                {slot.time} ({slot.status})
-                                {i < slots.length - 1 ? ", " : ""}
-                              </span>
-                            ))
-                          : "No slots"}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ) : (
-              <p>No information available for this restaurant.</p>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+      
+    </div>
   );
 }

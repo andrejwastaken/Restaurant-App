@@ -37,7 +37,8 @@ function ProfileOwnedRestaurantViewReservationDetailView({
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: true, // Use 12-hour format with AM/PM
+      hour12: false, 
+      timeZone: "UTC", // Ensure consistent timezone handling
     });
   };
 
