@@ -90,7 +90,7 @@ const checkCollision = (table1, table2) => {
 };
 
 function ProfileOwnedRestaurantEditTableConfiguration() {
-  const { currentOwnedRestaurant, handleCurrentOwnedRestaurant, openModal } =
+  const { currentOwnedRestaurant, handleCurrentOwnedRestaurant } =
     useProfileData();
 
   const { tables, table_types } = currentOwnedRestaurant?.setup || [];

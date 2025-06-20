@@ -78,63 +78,68 @@ function RestaurantFormOperatingHoursViewContent({
   });
 
   return (
-    <div
-      className={`w-full max-h-[${scrollHeight}px] overflow-y-auto mt-6 space-y-3 pr-2`}
-    >
-      {daysOfWeek.map((day) => {
-        const dayInfo = operatingHours.find((h) => h.day_of_week === day.key);
-        const isOpen = enabledDays[day.key];
+    <div className="w-full flex-1 mt-7 pr-2">
+      <div
+        className="h-full overflow-y-auto space-y-3 pr-1"
+        style={{ maxHeight: `${scrollHeight}px` }}
+      >
+        {daysOfWeek.map((day) => {
+          const dayInfo = operatingHours.find((h) => h.day_of_week === day.key);
+          const isOpen = enabledDays[day.key];
 
-        return (
-          <div
-            key={day.key}
-            className="flex items-center gap-4 p-3 border rounded-lg bg-gray-50"
-          >
-            <input
-              type="checkbox"
-              checked={isOpen}
-              onChange={() => handleDayToggle(day.key)}
-              className="h-5 w-5 rounded text-amber-600 focus:ring-amber-500"
-            />
-            <span className="w-24 font-semibold text-gray-700">{day.name}</span>
+          return (
             <div
-              className={`flex items-center gap-2 transition-opacity duration-300 ${
-                isOpen ? "opacity-100" : "opacity-40 pointer-events-none"
-              }`}
+              key={day.key}
+              className="flex items-center gap-4 p-3 border rounded-lg bg-gray-50"
             >
-              <select
-                className="border p-2 rounded-md bg-white disabled:bg-gray-200"
-                value={dayInfo?.open_time?.slice(0, 5) || "09:00"}
-                onChange={(e) =>
-                  handleTimeChange(day.key, "open_time", e.target.value)
-                }
-                disabled={!isOpen}
+              <input
+                type="checkbox"
+                checked={isOpen}
+                onChange={() => handleDayToggle(day.key)}
+                className="h-5 w-5 rounded text-amber-600 focus:ring-amber-500"
+              />
+              <span className="w-24 font-semibold text-gray-700">
+                {day.name}
+              </span>
+              <div
+                className={`flex items-center gap-2 transition-opacity duration-300 ${
+                  isOpen ? "opacity-100" : "opacity-40 pointer-events-none"
+                }`}
               >
-                {timeOptions.map((time) => (
-                  <option key={`open-${time}`} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-              <span>to</span>
-              <select
-                className="border p-2 rounded-md bg-white disabled:bg-gray-200"
-                value={dayInfo?.close_time?.slice(0, 5) || "17:00"}
-                onChange={(e) =>
-                  handleTimeChange(day.key, "close_time", e.target.value)
-                }
-                disabled={!isOpen}
-              >
-                {timeOptions.map((time) => (
-                  <option key={`close-${time}`} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
+                <select
+                  className="border p-2 rounded-md bg-white disabled:bg-gray-200"
+                  value={dayInfo?.open_time?.slice(0, 5) || "09:00"}
+                  onChange={(e) =>
+                    handleTimeChange(day.key, "open_time", e.target.value)
+                  }
+                  disabled={!isOpen}
+                >
+                  {timeOptions.map((time) => (
+                    <option key={`open-${time}`} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+                <span>to</span>
+                <select
+                  className="border p-2 rounded-md bg-white disabled:bg-gray-200"
+                  value={dayInfo?.close_time?.slice(0, 5) || "17:00"}
+                  onChange={(e) =>
+                    handleTimeChange(day.key, "close_time", e.target.value)
+                  }
+                  disabled={!isOpen}
+                >
+                  {timeOptions.map((time) => (
+                    <option key={`close-${time}`} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

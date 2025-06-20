@@ -25,8 +25,6 @@ urlpatterns = [
     path('owned-restaurant/<int:restaurant_id>/add-special-day/', SpecialDayAddAPIView.as_view(), name='add-special-day'),
     path('owned-restaurant/<int:restaurant_id>/get-special-days/', SpecialDayGetAPIView.as_view(), name='get-special-days'),
     path('owned-restaurant/<int:restaurant_id>/special-day/<int:special_day_id>/delete/', SpecialDayDeleteAPIView.as_view(), name='special-day-delete'),
-
-
     path('geocode/', GeocodeView.as_view(), name='geocode-restaurant'),
     path('reverse-geocode/', ReverseGeocodeView.as_view(), name='reverse-geocode-restaurant')
 ]

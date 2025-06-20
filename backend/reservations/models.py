@@ -6,14 +6,22 @@ from restaurants.models import Table
 from clients.models import ClientProfile
 from django.core.exceptions import ValidationError
 from django.db.models import ExpressionWrapper
+
+
 class Reservation(models.Model):
     STATUS_CHOICES = (
         ('CONFIRMED', 'confirmed'),
         ('CANCELLED', 'cancelled'),
-    )  
+    )
 
     client = models.ForeignKey(ClientProfile, on_delete=models.CASCADE, related_name='reservations')
-    table = models.ForeignKey(Table, on_delete= models.CASCADE, related_name='reservations', help_text="The table being reserved")
+    table = models.ForeignKey(
+        Table,
+        on_delete=models.CASCADE,
+        related_name='reservations',
+        help_text="The table being reserved"
+    )
+
     start_time = models.DateTimeField(
         help_text="The date and time the reservation starts."
     )
@@ -35,13 +43,13 @@ class Reservation(models.Model):
     def clean(self):
         # The logic for an overlapping reservation is:
         # (New Start < Existing End) AND (New End > Existing Start)
-        
+
         if self.start_time and self.duration:
             new_reservation_end_time = self.start_time + self.duration
 
             # Create a reusable expression for calculating the end time in the database
             existing_end_time_expression = ExpressionWrapper(
-                F('start_time') + F('duration'), 
+                F('start_time') + F('duration'),
                 output_field=DateTimeField()
             )
 
@@ -55,9 +63,9 @@ class Reservation(models.Model):
             ).filter(
                 # Now, filter using the simple overlap logic
                 start_time__lt=new_reservation_end_time,  # Existing start < New end
-                end_time__gt=self.start_time              # Existing end > New start
+                end_time__gt=self.start_time  # Existing end > New start
             )
-            
+
             if conflicting_reservations.exists():
                 raise ValidationError(
                     "This table is already booked for the selected time slot."

@@ -17,6 +17,7 @@ import RestaurantFormTableConfiguration from "../../components/RestaurantFormTab
 import ProfileOwnedRestaurantEditTableConfiguration from "../../components/ProfileOwnedRestaurantEditTableConfiguration";
 import RestaurantFormAddressConfiguration from "../../components/RestaurantFormAddressConfiguration";
 import ProfileOwnedRestaurantEditAddressConfiguration from "../../components/ProfileOwnedRestaurantEditAddressConfiguration";
+import ProfileOwnedRestaurantViewReservationDetailTableView from "../../components/ProfileOwnedRestaurantViewReservationDetailTableView";
 
 const MODAL_CONFIG = {
   EDIT_USERNAME: {
@@ -39,21 +40,31 @@ const MODAL_CONFIG = {
     title: "Change table",
     Component: RestaurantFormTableConfiguration,
     label: "Table Setup Configuration",
+    width: 7,
   },
   EDIT_OWNED_TABLE_DATA: {
     title: "Change owned table",
     Component: ProfileOwnedRestaurantEditTableConfiguration,
     label: "Table Setup Configuration",
+    width: 7,
   },
   EDIT_ADDRESS_MAP: {
     title: "Change address map",
     Component: RestaurantFormAddressConfiguration,
     label: "Address Setup Configuration",
+    width: 7,
   },
   EDIT_OWNED_ADDRESS_MAP: {
     title: "Change owned restaurant address map",
     Component: ProfileOwnedRestaurantEditAddressConfiguration,
     label: "Address Setup Configuration",
+    width: 7,
+  },
+  SHOW_RESERVATION_TABLE_OWNER: {
+    title: "Show the exact reserved table",
+    Component: ProfileOwnedRestaurantViewReservationDetailTableView,
+    label: "Reserved table view",
+    width: 5,
   },
 };
 
@@ -237,7 +248,11 @@ const ProfilePage = () => {
         {CurrentModal &&
           (CurrentModal.title.includes("table") ||
           CurrentModal.title.includes("map") ? (
-            <ModalCanvasShell onClose={closeModal} label={CurrentModal.label}>
+            <ModalCanvasShell
+              onClose={closeModal}
+              label={CurrentModal.label}
+              width={CurrentModal.width}
+            >
               <CurrentModal.Component />
             </ModalCanvasShell>
           ) : (

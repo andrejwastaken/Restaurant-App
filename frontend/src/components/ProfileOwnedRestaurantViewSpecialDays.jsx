@@ -125,7 +125,6 @@ function ProfileOwnedRestaurantViewSpecialDays() {
     }
   };
 
-  // --- RENDER LOGIC BASED ON VIEWMODE ---
   let content;
 
   if (viewMode === "list") {

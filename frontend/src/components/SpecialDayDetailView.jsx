@@ -32,13 +32,13 @@ function SpecialDayDetailView({ selectedDay, onDelete, onReturn }) {
 
       <div className="flex space-x-4 mt-6 pt-4 border-t">
         <button
-          className="w-full bg-gray-300 text-white px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none"
+          className="flex-1 bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none transition-colors duration-200"
           onClick={onReturn}
         >
           Return
         </button>
         <button
-          className="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none"
+          className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none transition-colors duration-200"
           onClick={onDelete}
         >
           Delete

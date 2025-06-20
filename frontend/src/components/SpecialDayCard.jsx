@@ -19,10 +19,10 @@ function SpecialDayCard({ specialDay, onClick }) {
         </div>
         <div className="text-right flex-shrink-0 ml-4">
           <p className="text-sm font-medium text-green-600">
-            Open: {specialDay.open_time}
+            Open: {specialDay.open_time.slice(0, 5)}
           </p>
           <p className="text-sm font-medium text-red-600">
-            Close: {specialDay.close_time}
+            Close: {specialDay.close_time.slice(0, 5)}
           </p>
         </div>
       </div>

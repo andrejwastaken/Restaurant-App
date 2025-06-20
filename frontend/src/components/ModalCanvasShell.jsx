@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ModalCanvasShell({ children, onClose, label }) {
+function ModalCanvasShell({ children, onClose, label, width }) {
   const [isShowing, setIsShowing] = useState(false);
 
   useEffect(function () {
@@ -26,13 +26,13 @@ function ModalCanvasShell({ children, onClose, label }) {
   return (
     // Backdrop overlay
     <div
-      className={`fixed inset-0 bg-black flex justify-center items-center z-50 p-4 transition-opacity duration-300 ease-out ${
+      className={`z-[9999] fixed inset-0 bg-black flex justify-center items-center z-50 p-4 transition-opacity duration-300 ease-out ${
         isShowing ? "bg-opacity-60" : "bg-opacity-0"
       }`}
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-lg shadow-2xl w-full max-w-7xl h-[95vh] flex flex-col transform transition-all duration-300 ease-out ${
+        className={`bg-white rounded-lg shadow-2xl w-full max-w-${width}xl h-[95vh] flex flex-col transform transition-all duration-300 ease-out ${
           isShowing ? "opacity-100 scale-100" : "opacity-0 scale-95"
         }`}
         onClick={handleContentClick}

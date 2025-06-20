@@ -25,34 +25,30 @@ function RestaurantFormOperatingHoursView({
   };
 
   return (
-    <div className="w-full h-full p-6 flex flex-col justify-between">
-      <div className="flex-shrink-0">
+    <div className="w-full h-full p-6 flex flex-col">
+      <div className="flex-1 flex flex-col">
         <ProfileMenuContentTitle label="Operating Hours Information" />
-        <div className="mt-10">
-          <RestaurantFormOperatingHoursViewContent
-            operatingHours={currentOperatingHours}
-            onChangeOperatingHours={handleOperatingHoursChange}
-            scrollHeight={450}
-          />
-        </div>
+        <RestaurantFormOperatingHoursViewContent
+          operatingHours={currentOperatingHours}
+          onChangeOperatingHours={handleOperatingHoursChange}
+          scrollHeight={500}
+        />
       </div>
 
-      <div className="flex-shrink-0 pt-6">
-        <div className="flex space-x-4">
-          <button
-            className="w-full bg-gray-300 text-white px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none"
-            onClick={onReturn}
-          >
-            Return
-          </button>
+      <div className="flex space-x-4 pt-6">
+        <button
+          className="w-full bg-gray-300 text-white px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none"
+          onClick={onReturn}
+        >
+          Return
+        </button>
 
-          <button
-            className="w-full bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 focus:outline-none"
-            onClick={handleSaveClick}
-          >
-            Save
-          </button>
-        </div>
+        <button
+          className="w-full bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 focus:outline-none"
+          onClick={handleSaveClick}
+        >
+          Save
+        </button>
       </div>
     </div>
   );

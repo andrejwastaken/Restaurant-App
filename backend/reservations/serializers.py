@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from reservations.models import Reservation
-from restaurants.serializers import TableSerializer
+# from restaurants.serializers import TableSerializer
 from users.serializers import NestedUserSerializer
 
 class ReservationListSerializer(serializers.ModelSerializer):
@@ -13,10 +13,11 @@ class ReservationListSerializer(serializers.ModelSerializer):
         read_only=True, 
         help_text="Details of the user who made the reservation."
     )
-    table = TableSerializer(
-        read_only=True, 
-        help_text="Details of the table being reserved."
-    )
+    # table = TableSerializer(
+    #     read_only=True,
+    #     help_text="Details of the table being reserved."
+    # )
+    table = serializers.SerializerMethodField()
     # For both views, we want to know which table was booked.
     
     class Meta:
@@ -29,3 +30,17 @@ class ReservationListSerializer(serializers.ModelSerializer):
             'client_user',
             'table',
         ]
+
+    def get_table(self, obj):
+        """
+        Retrieves and serializes the related Table object.
+        Performs a local import of TableSerializer to break circular dependencies.
+        """
+        # LOCAL IMPORT OF TABLESERIALIZER TO BREAK CIRCULAR DEPENDENCY
+        # This import only happens when get_table is called,
+        # ensuring restaurants.serializers is fully loaded.
+        from restaurants.serializers import TableSerializer
+
+        # obj.table is the actual Table model instance
+        # Pass the current serializer's context to the nested serializer
+        return TableSerializer(obj.table, context=self.context).data

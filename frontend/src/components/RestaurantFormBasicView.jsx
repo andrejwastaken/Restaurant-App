@@ -49,7 +49,7 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
   };
 
   return (
-    <div className="w-full h-screen p-6 flex flex-col">
+    <div className="w-full h-full p-6 flex flex-col">
       <div className="flex-1 overflow-y-auto pr-2">
         <ProfileMenuContentTitle label="Basic Information" />
         <RestaurantFormBasicViewContent
@@ -64,7 +64,7 @@ function RestaurantFormBasicView({ basicInformation, onSave, onReturn }) {
         />
       </div>
 
-      <div className="flex space-x-4 pt-4">
+      <div className="flex space-x-4 pt-6">
         <button
           className="w-full bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none"
           onClick={onReturn}

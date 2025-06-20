@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 function RestaurantFormTableConfigurationCanvas({
   tables,
@@ -7,6 +7,7 @@ function RestaurantFormTableConfigurationCanvas({
   onResize,
 }) {
   const canvasRef = useRef(null);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -28,11 +29,28 @@ function RestaurantFormTableConfigurationCanvas({
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     context.clearRect(0, 0, canvas.width, canvas.height);
+
     (tables || []).forEach((table) => {
       const isPending = table.isPending;
-      context.fillStyle = isPending ? "rgba(59, 130, 246, 0.5)" : "#F0F0F0";
-      context.strokeStyle = isPending ? "rgb(37, 99, 235)" : "black";
-      context.lineWidth = isPending ? 2 : 1;
+      const isAvailable = table.isAvailable; // Check if the table is available
+
+      // *** MODIFIED LOGIC ***
+      // Set the fill and stroke styles based on the table's state.
+      // 'available' tables are now drawn in green.
+      if (isAvailable) {
+        context.fillStyle = "rgba(34, 197, 94, 0.7)"; // A nice, slightly transparent green
+        context.strokeStyle = "rgb(22, 163, 74)"; // A darker green for the border
+        context.lineWidth = 2;
+      } else if (isPending) {
+        context.fillStyle = "rgba(59, 130, 246, 0.5)";
+        context.strokeStyle = "rgb(37, 99, 235)";
+        context.lineWidth = 2;
+      } else {
+        context.fillStyle = "#F0F0F0"; // Default style
+        context.strokeStyle = "black";
+        context.lineWidth = 1;
+      }
+
       if (table.shape.toLowerCase() === "circle") {
         context.beginPath();
         context.arc(table.x, table.y, table.radius, 0, 2 * Math.PI);

@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.db import transaction
+
+from reservations.models import Reservation
 from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay
+
+from reservations.serializers import ReservationListSerializer
 
 
 class OperatingHoursNestedSerializer(serializers.ModelSerializer):
@@ -54,6 +58,7 @@ class TableSerializer(serializers.ModelSerializer):
             'y_position',
             'width',
             'height',
+            'radius',
             'shape'
         ]
         read_only_fields = ['id']
@@ -224,9 +229,31 @@ class RestaurantSetupDetailSerializer(serializers.ModelSerializer):
     tables = TableDetailSerializer(many=True, read_only=True)
     special_days = SpecialDaySerializer(many=True, read_only=True)
 
+    reservations = serializers.SerializerMethodField()
+
     class Meta:
         model = RestaurantSetup
-        fields = ['id', 'default_slot_duration', 'operating_hours', 'table_types', 'tables', 'special_days']
+        fields = ['id', 'default_slot_duration', 'operating_hours', 'table_types', 'tables', 'special_days', 'reservations']
+
+    def get_reservations(self, obj):
+        """
+        Retrieves all reservations for the restaurant associated with this setup.
+        It uses the ReservationListSerializer to format the data.
+        """
+        # obj here is an instance of RestaurantSetup
+
+        # The filter `table__setup=obj` means:
+        # "Find all Reservation objects (starting from Reservation.objects)...
+        # ...where the 'table' field on that Reservation...
+        # ...has a 'setup' field (referring to the RestaurantSetup the table belongs to)...
+        # ...and THAT 'setup' object is equal to the current 'obj' (the RestaurantSetup being serialized)."
+        queryset = Reservation.objects.filter(
+            table__setup=obj  # This correctly filters reservations whose table's setup is the current 'obj'
+        ).select_related(
+            'table', 'client__user'
+        ).order_by('-start_time')
+
+        return ReservationListSerializer(queryset, many=True, context=self.context).data
 
 class OwnedRestaurantDetailSerializer(serializers.ModelSerializer):
     setup = RestaurantSetupDetailSerializer(read_only=True)

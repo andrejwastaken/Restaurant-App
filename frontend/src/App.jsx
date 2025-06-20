@@ -1,8 +1,8 @@
 import "./index.css";
 import {
-	createBrowserRouter,
-	RouterProvider,
-	Navigate,
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
@@ -27,131 +27,136 @@ import RestaurantsUserDetails from "./pages/ReservationPages/RestaurantsUserDeta
 import ReservationShowTables from "./pages/ReservationPages/ReservationShowTables";
 import Finalizer from "./pages/ReservationPages/ReservationFinalizer";
 import ReservationInformation from "./components/ReservationInformation.jsx";
+import ProfileOwnedRestaurantViewReservationDetailView from "./components/ProfileOwnedRestaurantViewReservationDetailView";
 
 const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <Home />,
-	},
-	{
-		path: "/restaurants",
-		element: <RestaurantList />,
-	},
-	{
-		path: "/restaurants/:id",
-		element: <RestaurantDetailPage />,
-	},
-	{
-		path: "/restaurants-calendar/:id",
-		element: (
-			<ProtectedRoute>
-				<RestaurantsCalendar />
-			</ProtectedRoute>
-		),
-	},
-	{
-		path: "/reservation-details/:id",
-		element: (
-			<ProtectedRoute>
-				<RestaurantsUserDetails />
-			</ProtectedRoute>
-		),
-	},
-	{
-		path: "/available-tables/:id",
-		element: (
-			<ProtectedRoute>
-				<ReservationShowTables />
-			</ProtectedRoute>
-		),
-	},
-	{
-		path: "/confirm-booking",
-		element: (
-			<ProtectedRoute>
-				<Finalizer />
-			</ProtectedRoute>
-		),
-	},
-	{
-		path: "/login",
-		element: <Login />,
-	},
-	{
-		path: "/register",
-		element: <Register />,
-	},
-	{
-		path: "/user",
-		element: (
-			<ProtectedRoute>
-				<ProfilePage />
-			</ProtectedRoute>
-		),
-		children: [
-			{
-				index: true,
-				element: <Navigate to="personal-info" replace />,
-			},
-			{
-				path: "personal-info",
-				element: <ProfilePersonalInfo />,
-			},
-			{
-				path: "reservations",
-				element: <ReservationInformation />,
-			},
-			{
-				path: "your-reservations",
-				element: <ProfileReservationHistory />,
-			},
-			{
-				path: "favourite-restaurants",
-				element: <ProfileFavouriteRestaurants />,
-			},
-			{
-				path: "owned-restaurants",
-				element: <ProfileOwnedRestaurants />,
-				children: [
-					{
-						path: ":restaurantId",
-						element: <ProfileOwnedRestaurantView />,
-						children: [
-							{
-								index: true,
-								element: <Navigate to="reservations" replace />,
-							},
-							{
-								path: "reservations",
-								element: <ProfileOwnedRestaurantViewReservations />,
-							},
-							{
-								path: "special-days",
-								element: <ProfileOwnedRestaurantViewSpecialDays />,
-							},
-							{
-								path: "edit-restaurant",
-								element: <ProfileOwnedRestaurantViewEditRestaurant />,
-							},
-						],
-					},
-				],
-			},
-			{
-				path: "add-restaurant",
-				element: <ProfileAddRestaurant />,
-			},
-		],
-	},
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/restaurants",
+    element: <RestaurantList />,
+  },
+  {
+    path: "/restaurants/:id",
+    element: <RestaurantDetailPage />,
+  },
+  {
+    path: "/restaurants-calendar/:id",
+    element: (
+      <ProtectedRoute>
+        <RestaurantsCalendar />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/reservation-details/:id",
+    element: (
+      <ProtectedRoute>
+        <RestaurantsUserDetails />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/available-tables/:id",
+    element: (
+      <ProtectedRoute>
+        <ReservationShowTables />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/confirm-booking",
+    element: (
+      <ProtectedRoute>
+        <Finalizer />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/user",
+    element: (
+      <ProtectedRoute>
+        <ProfilePage />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Navigate to="personal-info" replace />,
+      },
+      {
+        path: "personal-info",
+        element: <ProfilePersonalInfo />,
+      },
+      {
+        path: "reservations",
+        element: <ReservationInformation />,
+      },
+      {
+        path: "your-reservations",
+        element: <ProfileReservationHistory />,
+      },
+      {
+        path: "favourite-restaurants",
+        element: <ProfileFavouriteRestaurants />,
+      },
+      {
+        path: "owned-restaurants",
+        element: <ProfileOwnedRestaurants />,
+        children: [
+          {
+            path: ":restaurantId",
+            element: <ProfileOwnedRestaurantView />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="reservations" replace />,
+              },
+              {
+                path: "reservations",
+                element: <ProfileOwnedRestaurantViewReservations />,
+              },
+              {
+                path: "reservations/:reservationId",
+                element: <ProfileOwnedRestaurantViewReservationDetailView />,
+              },
+              {
+                path: "special-days",
+                element: <ProfileOwnedRestaurantViewSpecialDays />,
+              },
+              {
+                path: "edit-restaurant",
+                element: <ProfileOwnedRestaurantViewEditRestaurant />,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: "add-restaurant",
+        element: <ProfileAddRestaurant />,
+      },
+    ],
+  },
 ]);
 
 function App() {
-	return (
-		<>
-			<RouterProvider router={router} />
-			<Toaster position="bottom-center" />
-		</>
-	);
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster position="bottom-center" />
+    </>
+  );
 }
 
 export default App;
