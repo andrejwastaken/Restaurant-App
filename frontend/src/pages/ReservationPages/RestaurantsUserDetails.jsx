@@ -33,6 +33,7 @@ function ReservationDetailsPage() {
 	const selectedTimeSlot = location.state?.selectedTimeSlot;
 	const restaurantOperatingHours = location.state?.restaurantOperatingHours;
 	const defaultSlotDuration = location.state?.restaurantTimeSlot;
+	const restaurantSpecialDays = location.state?.restaurantSpecialDays;
 	const selectedDate = useMemo(
 		() => new Date(selectedDateISO),
 		[selectedDateISO]
@@ -51,40 +52,61 @@ function ReservationDetailsPage() {
 	}, [partySize, duration]);
 
 	const durationOptions = useMemo(() => {
-		if (!selectedDate || !selectedTimeSlot || !restaurantOperatingHours)
-			return [];
+    if (
+        !selectedDate ||
+        !selectedTimeSlot ||
+        !restaurantOperatingHours ||
+        !restaurantSpecialDays 
+    ) {
+        return [];
+    }
 
-		const dayOfWeek = selectedDate.getDay();
-		const mondayBasedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    let closeTimeStr = null;
 
-		const operatingHours = restaurantOperatingHours.find(
-			(h) => h.day_of_week === mondayBasedDay
-		);
-		if (!operatingHours) return [];
+    const dateString = selectedDate.toISOString().split("T")[0];
+    const specialDay = restaurantSpecialDays.find((d) => d.day === dateString);
 
-		const [closeHour, closeMin] = operatingHours.close_time
-			.split(":")
-			.map(Number);
-		const [startHour, startMin] = selectedTimeSlot.split(":").map(Number);
+    if (specialDay) {
+        closeTimeStr = specialDay.close_time;
+    } else {
+        const dayOfWeek = selectedDate.getDay();
+        const mondayBasedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Monday is 0, Sunday is 6
 
-		const startTime = startHour * 60 + startMin;
-		const closeTime = closeHour * 60 + closeMin;
+        const operatingHours = restaurantOperatingHours.find(
+            (h) => h.day_of_week === mondayBasedDay
+        );
+        if (operatingHours) {
+            closeTimeStr = operatingHours.close_time;
+        }
+    }
 
-		const maxDuration = closeTime - startTime;
-		const options = [];
+    if (!closeTimeStr) {
+        return [];
+    }
 
-		for (let d = defaultSlotDuration; d <= maxDuration; d += 30) {
-			options.push(d);
-		}
 
-		return options;
-	}, [
-		selectedDate,
-		selectedTimeSlot,
-		restaurantOperatingHours,
-		defaultSlotDuration,
-	]);
+    const [closeHour, closeMin] = closeTimeStr.split(":").map(Number);
+    const [startHour, startMin] = selectedTimeSlot.split(":").map(Number);
 
+    const startTimeInMinutes = startHour * 60 + startMin;
+    const closeTimeInMinutes = closeHour * 60 + closeMin;
+
+    const maxDuration = closeTimeInMinutes - startTimeInMinutes;
+    const options = [];
+
+    for (let d = defaultSlotDuration; d <= maxDuration; d += 30) {
+        options.push(d);
+    }
+
+    return options;
+}, [
+    selectedDate,
+    selectedTimeSlot,
+    restaurantOperatingHours,
+    restaurantSpecialDays,
+    defaultSlotDuration,
+]);
+	console.log("Duration Options:", durationOptions);
 	const handleFindTables = async () => {
 		const params = {
 			time: selectedTimeSlot,
@@ -149,7 +171,6 @@ function ReservationDetailsPage() {
 		<div className="bg-gray-50 min-h-screen">
 			<Navbar />
 			<div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
-				{/* --- Header with Back Button --- */}
 				<div className="flex items-center mb-6">
 					<button
 						onClick={() => navigate(-1)}
@@ -163,7 +184,6 @@ function ReservationDetailsPage() {
 					</h1>
 				</div>
 
-				{/* --- Summary of Selection --- */}
 				<div className="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-lg mb-8 flex items-center">
 					<Calendar className="w-5 h-5 mr-3" />
 					<p className="font-semibold">
@@ -177,9 +197,7 @@ function ReservationDetailsPage() {
 					</p>
 				</div>
 
-				{/* --- Form Sections --- */}
 				<div className="space-y-6">
-					{/* 1. Party Size */}
 					<InfoSection
 						icon={<Users className="w-6 h-6 text-amber-600" />}
 						title="How many people?"
@@ -200,7 +218,6 @@ function ReservationDetailsPage() {
 						</select>
 					</InfoSection>
 
-					{/* 2. Smoker Preference */}
 					<InfoSection
 						icon={<Cigarette className="w-6 h-6 text-amber-600" />}
 						title="Smoking Preference"
@@ -218,7 +235,6 @@ function ReservationDetailsPage() {
 						</label>
 					</InfoSection>
 
-					{/* 3. Duration */}
 					<InfoSection
 						icon={<Clock className="w-6 h-6 text-amber-600" />}
 						title="How long will you stay?"
@@ -241,7 +257,6 @@ function ReservationDetailsPage() {
 					</InfoSection>
 				</div>
 
-				{/* --- Action Button --- */}
 				<div className="mt-8">
 					<button
 						onClick={handleFindTables}

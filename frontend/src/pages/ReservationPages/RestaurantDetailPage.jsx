@@ -25,7 +25,7 @@ function RestaurantDetailPage() {
 	const [restaurant, setRestaurant] = useState(null);
 	const [isLoading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const { isAuthorized, user } = useAuth();
+	const { isAuthorized } = useAuth();
 
 	useEffect(() => {
 		const fetchRestaurantDetails = async () => {
@@ -124,6 +124,7 @@ function RestaurantDetailPage() {
 									state={{
 										restaurantTimeSlot: restaurant.default_slot_duration,
 										restaurantOperatingHours: restaurant.operating_hours,
+										restaurantSpecialDays: restaurant.special_days,
 									}}
 									className="w-full max-w-xs px-8 py-3 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
 								>

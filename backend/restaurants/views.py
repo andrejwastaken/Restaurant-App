@@ -1,17 +1,19 @@
 from rest_framework import permissions, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay
 from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer, \
     OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer, TableSerializer, SpecialDaySerializer
 from datetime import datetime, timedelta
-from collections import defaultdict
 from django.shortcuts import get_object_or_404
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
 from reservations.models import Reservation
 from django.db.models import F, ExpressionWrapper, DateTimeField
+from django.utils.dateparse import parse_time
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 class RestaurantListDetailAPIView(APIView):
     def get(self, request, pk=None):
@@ -35,7 +37,6 @@ class CreateRestaurantView(APIView):
         serializer = RestaurantCreateWithSetupSerializer(data=request.data, context = {'request': request})
 
         if serializer.is_valid():
-            print(serializer.validated_data)
             restaurant = serializer.save()
 
             return Response({"message": "Restaurant created successfully", 'id': restaurant.id}, status=status.HTTP_201_CREATED)
@@ -98,48 +99,6 @@ class UpdateRestaurantView(APIView):
             return Response({"message": "Restaurant profile updated successfully."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# class TimeSlotCreateAPIView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#
-#     def post(self, request, setup_id, table_type_id, *args, **kwargs):
-#         # 1. Verify that the owner making the request owns this setup.
-#         setup = get_object_or_404(RestaurantSetup, id=setup_id, restaurant__owner=request.user)
-#         table_type = get_object_or_404(TableType, id=table_type_id, setup=setup)
-#
-#         serializer = TimeSlotCreateSerializer(data=request.data, many=isinstance(request.data, list))
-#
-#         if serializer.is_valid():
-#             slots_data = serializer.validated_data
-#
-#             slots_to_create = []
-#             for slot_data in (slots_data if isinstance(slots_data, list) else [slots_data]):
-#                 # Validation: Ensure quantity doesn't exceed the total tables of this type.
-#                 if slot_data['quantity_available'] > table_type.total_quantity:
-#                     return Response(
-#                         {"error": f"Quantity ({slot_data['quantity_available']}) cannot exceed the total available tables of this type ({table_type.total_quantity})."},
-#                         status=status.HTTP_400_BAD_REQUEST
-#                     )
-#
-#                 slots_to_create.append(
-#                     TimeSlot(
-#                         setup=setup,
-#                         table_type=table_type,
-#                         date=slot_data['date'],
-#                         time=slot_data['time'],
-#                         quantity_available=slot_data['quantity_available']
-#                     )
-#                 )
-#
-#             # Use `bulk_create` for efficiency if creating multiple slots.
-#             TimeSlot.objects.bulk_create(slots_to_create)
-#
-#             return Response({"message": f"{len(slots_to_create)} time slot(s) created successfully."}, status=status.HTTP_201_CREATED)
-#
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class OwnedRestaurantsListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -163,7 +122,6 @@ class OwnedRestaurantDetailView(APIView):
 
         serializer = OwnedRestaurantDetailSerializer(restaurant)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 class GeocodeView(APIView):
@@ -234,7 +192,6 @@ class ReverseGeocodeView(APIView):
                 status=status.HTTP_503_SERVICE_UNAVAILABLE
             )
         except Exception as e:
-            print(f"Error during reverse geocoding: {e}")
             return Response(
                 {'error': 'An unexpected error occurred.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -242,7 +199,8 @@ class ReverseGeocodeView(APIView):
         
 class RestaurantAvailabilityAPIView(APIView):
     """
-    Checks table availability, now including conflicts with existing reservations.
+    Checks table availability, correctly handling both special day schedules and
+    regular weekly hours with different weekday conventions.
     """
     permission_classes = [permissions.IsAuthenticated]
 
@@ -257,7 +215,8 @@ class RestaurantAvailabilityAPIView(APIView):
             return Response({'error': 'Missing required parameters: date, time, party_size'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            start_time = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+            naive_start_time = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+            start_time = timezone.make_aware(naive_start_time, timezone.get_current_timezone())
             duration = timedelta(minutes=int(duration_str))
             end_time = start_time + duration
             party_size = int(party_size_str)
@@ -267,15 +226,41 @@ class RestaurantAvailabilityAPIView(APIView):
 
         restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
         setup = get_object_or_404(RestaurantSetup, restaurant=restaurant)
-        day_of_week = start_time.weekday() # Monday=0, Sunday=6
+        request_date = start_time.date()
+        
+        effective_op_hours = None
 
-        try:
-            op_hours = OperationHours.objects.get(setup=setup, day_of_week=day_of_week)
-            if not (op_hours.open_time <= start_time.time() and end_time.time() <= op_hours.close_time):
-                 return Response({'error': 'Requested time is outside operational hours.'}, status=status.HTTP_400_BAD_REQUEST)
-        except OperationHours.DoesNotExist:
+        special_day = SpecialDay.objects.filter(setup=setup, day=request_date).first()
+
+        if special_day:
+            effective_op_hours = special_day
+        else:
+            python_weekday = request_date.weekday()  # Monday=0, ..., Sunday=6
+            weekday_map = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 0}
+            db_day_of_week = weekday_map[python_weekday]
+
+            try:
+                effective_op_hours = OperationHours.objects.get(setup=setup, day_of_week=db_day_of_week)
+            except OperationHours.DoesNotExist:
+                return Response({'error': 'The restaurant is not open on the selected day.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not effective_op_hours:
             return Response({'error': 'The restaurant is not open on the selected day.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        current_tz = timezone.get_current_timezone()
 
+        naive_open_datetime = datetime.combine(request_date, effective_op_hours.open_time)
+        naive_close_datetime = datetime.combine(request_date, effective_op_hours.close_time)
+
+        open_datetime = timezone.make_aware(naive_open_datetime, current_tz)
+        close_datetime = timezone.make_aware(naive_close_datetime, current_tz)
+
+        if close_datetime < open_datetime:
+            close_datetime += timedelta(days=1)
+
+        if not (start_time >= open_datetime and end_time <= close_datetime):
+            return Response({'error': 'Requested time is outside operational hours.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         existing_end_time_expression = ExpressionWrapper(F('start_time') + F('duration'), output_field=DateTimeField())
 
         conflicting_reservations = Reservation.objects.filter(
@@ -296,7 +281,6 @@ class RestaurantAvailabilityAPIView(APIView):
         unavailable_tables = []
 
         for table in all_restaurant_tables:
-            # A table is available if it meets all criteria:
             is_not_booked = table.id not in booked_table_ids
             has_enough_capacity = table.table_type.capacity >= party_size
             matches_smoking_pref = table.is_smoking == is_smoker
@@ -313,7 +297,6 @@ class RestaurantAvailabilityAPIView(APIView):
             'tables': available_serializer.data,
             'unavailable': unavailable_serializer.data,
         }, status=status.HTTP_200_OK)
-
 class SpecialDayAddAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

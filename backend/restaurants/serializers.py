@@ -22,11 +22,17 @@ class OperatingHoursNestedSerializer(serializers.ModelSerializer):
 class RestaurantSerializer(serializers.ModelSerializer):
     default_slot_duration = serializers.IntegerField(source='setup.default_slot_duration', read_only=True)
     operating_hours = OperatingHoursNestedSerializer(many=True, source='setup.operating_hours', read_only=True)
+    special_days = serializers.SerializerMethodField()
+    def get_special_days(self, obj):
+        """
+        Returns a list of special days for the restaurant's setup.
+        """
+        return SpecialDaySerializer(obj.setup.special_days.all(), many=True).data
     class Meta:
         model = Restaurant
         fields = [
             'id', 'name', 'description', 'is_validated', 'address', 'phone_number',
-            'latitude', 'longitude', 'default_slot_duration', 'operating_hours'
+            'latitude', 'longitude', 'default_slot_duration', 'operating_hours', 'special_days'
         ]
 
 class RestaurantSetupNestedSerializer(serializers.ModelSerializer):
