@@ -30,8 +30,7 @@ function ReservationQrPage() {
     const [isCancelling, setIsCancelling] = useState(false);
 
     const reservation = location.state?.reservation;
-    const restaurantId = location.state?.restaurant_id;
-
+    const restaurantId = location.state?.reservation.restaurant_id;
     if (!reservation) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center p-4">
@@ -46,7 +45,9 @@ function ReservationQrPage() {
     }
 
     const { date, time } = formatDateTime(reservation.start_time);
-    const qrCodeValue = `http://localhost:3000/user/owned-restaurants/${restaurantId}/reservations/${reservationId}`;
+    const ip = window.location.hostname;
+    console.log(ip);
+    const qrCodeValue = `http://192.168.144.66:3000/user/owned-restaurants/${restaurantId}/reservations/${reservationId}`;
     const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrCodeValue)}&ecc=H&margin=10`;
 
     const handleDecline = async () => {
