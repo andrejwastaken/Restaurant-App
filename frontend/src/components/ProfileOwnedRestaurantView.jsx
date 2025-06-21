@@ -20,28 +20,28 @@ function ProfileOwnedRestaurantView() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(
-    function () {
-      const fetchRestaurant = async () => {
-        try {
-          const response = await api.get(
-            `/api/owned-restaurants/${restaurantId}/`
-          );
-          handleCurrentOwnedRestaurant(response.data);
-          handleCurrentOwnedRestaurantSubmitCheck(response.data);
-        } catch (err) {
-          toast.error("Sorry, there seems to be a problem");
-        } finally {
-          setIsLoading(false);
-        }
-      };
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      try {
+        const response = await api.get(
+          `/api/owned-restaurants/${restaurantId}/`
+        );
+        handleCurrentOwnedRestaurant(response.data);
+        handleCurrentOwnedRestaurantSubmitCheck(response.data);
+      } catch (err) {
+        toast.error("Sorry, there seems to be a problem");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      setIsLoading(true);
-      fetchRestaurant();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [restaurantId]
-  );
+    setIsLoading(true);
+    fetchRestaurant();
+
+    // Listen for navigation to the same route (remount)
+    // This will force a reload if the component is remounted with the same restaurantId
+    // or if the user navigates to the same page again
+  }, [restaurantId, window.location.key]);
 
   return (
     <div className="w-full h-full flex flex-col">

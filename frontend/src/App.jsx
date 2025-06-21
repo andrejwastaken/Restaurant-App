@@ -28,6 +28,7 @@ import ReservationShowTables from "./pages/ReservationPages/ReservationShowTable
 import Finalizer from "./pages/ReservationPages/ReservationFinalizer";
 import ReservationInformation from "./components/ReservationInformation.jsx";
 import ProfileOwnedRestaurantViewReservationDetailView from "./components/ProfileOwnedRestaurantViewReservationDetailView";
+import ReservationQrPage from "./components/ReservationQRPage";
 
 const router = createBrowserRouter([
   {
@@ -105,6 +106,10 @@ const router = createBrowserRouter([
       {
         path: "your-reservations",
         element: <ProfileReservationHistory />,
+      },
+      {
+        path: "your-reservations/:reservationId",
+        element: <ReservationQrPage />,
       },
       {
         path: "favourite-restaurants",

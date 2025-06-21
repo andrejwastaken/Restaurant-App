@@ -105,22 +105,31 @@ function RestaurantsCalendar() {
             hours = { open: specialDayInfo.open, close: specialDayInfo.close };
         } else {
             const dayOfWeek = selectedDate.getDay();
-            const mondayBasedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const mondayBasedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; 
             hours = operatingHoursMap[mondayBasedDay];
         }
 
         if (!hours) return [];
 
-        const slots = [];
+        const timeSlots = [];
         const [openHour, openMin] = hours.open.split(":").map(Number);
         const [closeHour, closeMin] = hours.close.split(":").map(Number);
+        
         let currentTime = new Date(selectedDate);
         currentTime.setHours(openHour, openMin, 0, 0);
+        
         const closeTime = new Date(selectedDate);
         closeTime.setHours(closeHour, closeMin, 0, 0);
 
-        while (currentTime < closeTime) {
-            slots.push(
+        if (closeTime <= currentTime) {
+            closeTime.setDate(closeTime.getDate() + 1);
+        }
+
+        const lastValidStartTime = new Date(closeTime);
+        lastValidStartTime.setMinutes(lastValidStartTime.getMinutes() - restaurantTimeSlot);
+
+        while (currentTime <= lastValidStartTime) {
+            timeSlots.push(
                 currentTime.toLocaleTimeString("en-US", {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -129,7 +138,8 @@ function RestaurantsCalendar() {
             );
             currentTime.setMinutes(currentTime.getMinutes() + restaurantTimeSlot);
         }
-        return slots;
+        
+        return timeSlots;
     };
 
     const timeSlots = useMemo(generateTimeSlots, [

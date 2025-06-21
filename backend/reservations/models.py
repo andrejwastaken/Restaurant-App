@@ -47,21 +47,17 @@ class Reservation(models.Model):
         if self.start_time and self.duration:
             new_reservation_end_time = self.start_time + self.duration
 
-            # Create a reusable expression for calculating the end time in the database
             existing_end_time_expression = ExpressionWrapper(
                 F('start_time') + F('duration'),
                 output_field=DateTimeField()
             )
 
-            # Find conflicting reservations using the CORRECT annotate-then-filter pattern
             conflicting_reservations = Reservation.objects.filter(
                 table=self.table,
                 status='CONFIRMED'
             ).exclude(pk=self.pk).annotate(
-                # First, create the 'end_time' field for each existing reservation
                 end_time=existing_end_time_expression
             ).filter(
-                # Now, filter using the simple overlap logic
                 start_time__lt=new_reservation_end_time,  # Existing start < New end
                 end_time__gt=self.start_time  # Existing end > New start
             )

@@ -65,10 +65,10 @@ const Finalizer = () => {
 					</div>
 
 					<button
-						onClick={() => navigate("/")}
+						onClick={() => navigate("/user/your-reservations")}
 						className="w-full mt-6 px-4 py-3 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-colors"
 					>
-						Done
+						View your reservations.
 					</button>
 				</div>
 			</div>

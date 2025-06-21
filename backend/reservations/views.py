@@ -9,6 +9,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions
+from django.shortcuts import get_object_or_404
 from restaurants.serializers import TableSerializer
 
 class ReservationCreateAPIView(APIView):
@@ -35,7 +37,26 @@ class ReservationCreateAPIView(APIView):
                     duration_obj = timedelta(minutes=int(duration_str))
                 except (TypeError, ValueError):
                     raise ValidationError("Invalid format for start_time, duration")
+                
+                existing_cancelled_reservation = Reservation.objects.select_for_update().filter(
+                    client=client_profile,
+                    table_id=table_id,
+                    start_time=aware_start_time,
+                    duration=duration_obj,
+                    status='CANCELLED'
+                ).first()
 
+                if existing_cancelled_reservation:
+                    existing_cancelled_reservation.status = 'CONFIRMED'
+                    existing_cancelled_reservation.save()
+                    
+                    success_response = {
+                        "message": "Your previously cancelled reservation has been successfully re-confirmed!",
+                        "reservation_id": existing_cancelled_reservation.id,
+                        "restaurant_id": existing_cancelled_reservation.table.setup.restaurant.id,
+                    }
+                    return Response(success_response, status=status.HTTP_200_OK)
+                
                 # Fetch the table and lock the row for the duration of the transaction
                 # to prevent race conditions from other simultaneous requests.
                 table_to_book = Table.objects.select_for_update().get(id=table_id)
@@ -47,7 +68,6 @@ class ReservationCreateAPIView(APIView):
                 )
 
                 new_reservation.full_clean()
-
                 new_reservation.save()
 
                 success_response = {
@@ -62,8 +82,8 @@ class ReservationCreateAPIView(APIView):
         except ClientProfile.DoesNotExist:
              return Response({"success": False, "error": "No valid client profile found for the logged-in user."}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
-            return Response({"success": False, "error": e.messages[0]}, status=status.HTTP_400_BAD_REQUEST)
-        
+            error_message = e.messages[0] if isinstance(e.messages, list) else str(e)
+            return Response({"success": False, "error": error_message}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(f"Unexpected error during reservation creation: {e}")
             return Response(
@@ -76,8 +96,6 @@ class ReservationListAPIView(APIView):
 
     def get(self, request, pk=None):
         user = request.user
-
-        # --- Use Case 1: Fetching reservations for a restaurant owner ---
         if pk:
             try:
                 restaurant = Restaurant.objects.get(pk=pk, owner=user)
@@ -103,64 +121,51 @@ class ReservationListAPIView(APIView):
         serializer = ReservationListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-
-@transaction.atomic # Ensure that all operations are atomic (all or nothing)
-def cancel_reservation(reservation_id, client_id):
-    try:
-        # Ensure the user cancelling is the one who owns the reservation.
-        reservation = Reservation.objects.get(id=reservation_id, client__user_id=client_id)
-    except Reservation.DoesNotExist:
-        raise ValueError("Reservation not found or you do not have permission to cancel it.")
-
-    # Do not cancel already-cancelled reservations.
-    if reservation.status == Reservation.ReservationStatus.CANCELLED:
-        raise ValueError("This reservation has already been cancelled.")
-    
-    reservation.status = Reservation.ReservationStatus.CANCELLED
-    reservation.save()
-
-    time_slot = reservation.time_slot
-    time_slot.quantity_available += 1
-    time_slot.save()
-
-    return reservation 
-
-@transaction.atomic # This is critical for managing inventory correctly.
-def update_reservation_status_by_owner(reservation_id, owner_id, new_status):
-    try:
-        # Fetch reservation, ensuring the owner is the one managing this restaurant.
-        reservation = Reservation.objects.select_related('time_slot').get(
-            id=reservation_id, 
-            time_slot__setup__restaurant__owner_id=owner_id
+class ReservationCancelAPIView(APIView):
+    """
+    Handles cancellation of a reservation.
+    This single view serves two URL patterns:
+    1. By a client (e.g., /reservations/{res_id}/cancel/)
+    2. By a restaurant owner (e.g., /restaurants/{rest_id}/reservations/{res_id}/cancel/)
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    def delete(self, request, reservation_id, restaurant_id=None):
+        
+        reservation = get_object_or_404(
+            Reservation.objects.select_related('client__user', 'table__setup__restaurant__owner'),
+            pk=reservation_id
         )
-    except Reservation.DoesNotExist:
-        raise ValueError("Reservation not found or you do not manage this restaurant.")
-    
-    # Validate that the new status is a valid choice.
-    valid_statuses = [choice[0] for choice in Reservation.STATUS_CHOICES]
-    if new_status not in valid_statuses:
-        raise ValueError(f"'{new_status}' is not a valid reservation status.")
+        if restaurant_id is not None:
+            if reservation.table.setup.restaurant.id != restaurant_id:
+                return Response(
+                    {'error': 'This reservation does not belong to the specified restaurant.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            if reservation.table.setup.restaurant.owner != request.user:
+                return Response(
+                    {'error': 'You do not have permission to manage this restaurant.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
 
-    old_status = reservation.status
-    
-    # If the status isn't changing, do nothing.
-    if old_status == new_status:
-        return reservation
+        else:
+            if reservation.client.user != request.user:
+                return Response(
+                    {'error': 'You do not have permission to cancel this reservation.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
-    # If an active reservation ('PENDING' or 'CONFIRMED') is being blocked, we need to return the spot to the inventory.
-    if new_status == 'BLOCKED' and old_status != 'BLOCKED':
-        reservation.time_slot.quantity_available += 1
-        reservation.time_slot.save()
-        print("The reservation is being blocked for the first time.")
-    
-    elif old_status == 'BLOCKED' and new_status != 'BLOCKED':
-        reservation.time_slot.quantity_available -= 1
-        reservation.time_slot.save()
-        print("The reservation is being unblocked, returning the spot to the inventory.")
-    
-    
-    reservation.status = new_status
-    reservation.save()
-    
-    return reservation
+        if reservation.status != 'CONFIRMED':
+            return Response(
+                {'error': f'This reservation cannot be cancelled as its status is already {reservation.status}.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        reservation.status = 'CANCELLED'
+        reservation.save()
+        
+        return Response(
+            {'message': 'Reservation has been successfully cancelled.'},
+            status=status.HTTP_200_OK
+        )

@@ -31,6 +31,7 @@ function ReservationsList({
                 key={reservation.id}
                 reservation={reservation}
                 onClick={() => onViewReservation(reservation.id)}
+                viewType = "owner"
               />
             ))}
           </div>
@@ -45,7 +46,6 @@ function ReservationsList({
 
       {totalPages > 1 && (
         <div className="flex-shrink-0 pt-4 mt-auto flex items-center justify-between text-sm border-t border-gray-200">
-          {/* Previous page button */}
           <button
             onClick={handlePrevPage}
             disabled={currentPage === 0}
@@ -67,11 +67,9 @@ function ReservationsList({
             </svg>
             <span>Back</span>
           </button>
-          {/* Current page and total pages indicator */}
           <span className="font-medium text-gray-600">
             Page {currentPage + 1} of {totalPages}
           </span>
-          {/* Next page button */}
           <button
             onClick={handleNextPage}
             disabled={currentPage >= totalPages - 1}

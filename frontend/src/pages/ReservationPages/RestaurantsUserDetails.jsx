@@ -60,7 +60,6 @@ function ReservationDetailsPage() {
     ) {
         return [];
     }
-
     let closeTimeStr = null;
 
     const dateString = selectedDate.toISOString().split("T")[0];
@@ -94,10 +93,9 @@ function ReservationDetailsPage() {
     const maxDuration = closeTimeInMinutes - startTimeInMinutes;
     const options = [];
 
-    for (let d = defaultSlotDuration; d <= maxDuration; d += 30) {
+    for (let d = defaultSlotDuration; d <= maxDuration; d += defaultSlotDuration) {
         options.push(d);
     }
-
     return options;
 }, [
     selectedDate,
@@ -106,7 +104,6 @@ function ReservationDetailsPage() {
     restaurantSpecialDays,
     defaultSlotDuration,
 ]);
-	console.log("Duration Options:", durationOptions);
 	const handleFindTables = async () => {
 		const params = {
 			time: selectedTimeSlot,

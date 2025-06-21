@@ -13,11 +13,17 @@ class ReservationListSerializer(serializers.ModelSerializer):
         read_only=True, 
         help_text="Details of the user who made the reservation."
     )
-    # table = TableSerializer(
-    #     read_only=True,
-    #     help_text="Details of the table being reserved."
-    # )
     table = serializers.SerializerMethodField()
+    restaurant_id = serializers.IntegerField(
+        source='table.setup.restaurant.id',
+        read_only=True,
+        help_text="ID of the restaurant where the table is located."
+    )
+    restaurant_name = serializers.CharField(
+        source='table.setup.restaurant.name',
+        read_only=True,
+        help_text="Name of the restaurant where the table is located."
+    )
     # For both views, we want to know which table was booked.
     
     class Meta:
@@ -29,6 +35,8 @@ class ReservationListSerializer(serializers.ModelSerializer):
             'duration',
             'client_user',
             'table',
+            'restaurant_id',
+            'restaurant_name',
         ]
 
     def get_table(self, obj):
@@ -42,5 +50,4 @@ class ReservationListSerializer(serializers.ModelSerializer):
         from restaurants.serializers import TableSerializer
 
         # obj.table is the actual Table model instance
-        # Pass the current serializer's context to the nested serializer
         return TableSerializer(obj.table, context=self.context).data
