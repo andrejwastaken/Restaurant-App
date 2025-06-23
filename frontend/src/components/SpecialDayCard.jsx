@@ -12,7 +12,7 @@ function SpecialDayCard({ specialDay, onClick }) {
       onClick={onClick}
       className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-amber-500 cursor-pointer transition-all duration-200"
     >
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-center">
         <div>
           <p className="font-semibold text-lg text-gray-900">{formattedDate}</p>
           <p className="text-sm text-gray-600 mt-1">{specialDay.description}</p>

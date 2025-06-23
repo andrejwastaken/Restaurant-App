@@ -99,6 +99,7 @@ class UpdateRestaurantView(APIView):
             return Response({"message": "Restaurant profile updated successfully."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class OwnedRestaurantsListView(APIView):
     permission_classes = [IsAuthenticated]
 

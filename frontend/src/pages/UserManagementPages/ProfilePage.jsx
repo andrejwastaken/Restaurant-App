@@ -192,13 +192,13 @@ const ProfilePage = () => {
   function handleSaveAddRestaurantItem(updatedData) {
     const finalAddRestaurantData = { ...addRestaurantData, ...updatedData };
     setAddRestaurantData(finalAddRestaurantData);
-    closeModal();
+    // closeModal();
   }
 
   //EDITING CURRENT RESTAURANT LOGIC
   function handleCurrentOwnedRestaurant(data) {
     setCurrentOwnedRestaurant(data);
-    closeModal();
+    // closeModal();
   }
 
   function handleCurrentOwnedRestaurantSubmitCheck(data) {

@@ -23,7 +23,7 @@ function ReservationsList({
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="flex-grow overflow-y-auto pt-4 pr-1">
+      <div className="flex-grow overflow-y-auto pt-1 pr-1">
         {reservationsArray.length > 0 ? (
           <div className="space-y-3">
             {currentReservations.map((reservation) => (

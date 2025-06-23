@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
-import RestaurantList from "./pages/ReservationPages/RestaurantList";
 import Home from "./pages/Home";
 import Register from "./pages/LoginRegisterPages/Register";
 import Login from "./pages/LoginRegisterPages/Login";
@@ -22,12 +21,13 @@ import ProfileOwnedRestaurantViewSpecialDays from "./components/ProfileOwnedRest
 import ProfileOwnedRestaurantViewEditRestaurant from "./components/ProfileOwnedRestaurantViewEditRestaurant";
 import ProfileAddRestaurant from "./components/ProfileAddRestaurant";
 import RestaurantDetailPage from "./pages/ReservationPages/RestaurantDetailPage";
-import RestaurantsCalendar from "./pages/ReservationPages/RestaurantsCalendar";
-import RestaurantsUserDetails from "./pages/ReservationPages/RestaurantsUserDetails";
-import ReservationShowTables from "./pages/ReservationPages/ReservationShowTables";
 import Finalizer from "./pages/ReservationPages/ReservationFinalizer";
 import ReservationInformation from "./components/ReservationInformation.jsx";
 import ProfileOwnedRestaurantViewReservationDetailView from "./components/ProfileOwnedRestaurantViewReservationDetailView";
+import Restaurants from "./pages/Restaurants.jsx";
+import RestaurantsMap from "./components/RestaurantsMap.jsx";
+import RestaurantsList from "./components/RestaurantsList.jsx";
+import ReservationBooking from "./components/ReservationBooking.jsx";
 import ReservationQrPage from "./components/ReservationQRPage";
 
 const router = createBrowserRouter([
@@ -37,35 +37,31 @@ const router = createBrowserRouter([
   },
   {
     path: "/restaurants",
-    element: <RestaurantList />,
-  },
-  {
-    path: "/restaurants/:id",
-    element: <RestaurantDetailPage />,
-  },
-  {
-    path: "/restaurants-calendar/:id",
-    element: (
-      <ProtectedRoute>
-        <RestaurantsCalendar />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/reservation-details/:id",
-    element: (
-      <ProtectedRoute>
-        <RestaurantsUserDetails />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/available-tables/:id",
-    element: (
-      <ProtectedRoute>
-        <ReservationShowTables />
-      </ProtectedRoute>
-    ),
+    element: <Restaurants />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="map-view" replace />,
+      },
+      {
+        path: "list-view",
+        element: <RestaurantsList />,
+      },
+      {
+        path: "map-view",
+        element: <RestaurantsMap />,
+      },
+      {
+        path: ":restaurantId",
+        element: <RestaurantDetailPage />,
+        children: [
+          {
+            path: "book",
+            element: <ReservationBooking />,
+          },
+        ],
+      },
+    ],
   },
   {
     path: "/confirm-booking",
