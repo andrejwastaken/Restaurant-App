@@ -6,7 +6,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate 
 from .serializers import UserUpdateSerializer
 
-# Create your views here.
 class UserUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 

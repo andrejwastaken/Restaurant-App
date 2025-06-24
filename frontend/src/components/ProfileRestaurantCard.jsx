@@ -10,7 +10,6 @@ function ProfileRestaurantCard({ restaurant, type = "profileOwned" }) {
       }
       className="w-full bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-amber-500 transition-all duration-300 ease-in-out cursor-pointer flex items-center justify-between group"
     >
-      {/* Left side: Icon and Name */}
       <div className="flex items-center space-x-5">
         <div className="bg-amber-100 p-3 rounded-full border-2 border-amber-200 group-hover:bg-amber-500 transition-colors duration-300">
           <svg
@@ -34,7 +33,6 @@ function ProfileRestaurantCard({ restaurant, type = "profileOwned" }) {
         </div>
       </div>
 
-      {/* Right side: Status and Arrow */}
       <div className="flex items-center space-x-6">
         <span
           className={`px-3 py-1 text-xs font-semibold rounded-full ${

@@ -132,19 +132,15 @@ class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):
 
     @transaction.atomic # Ensure all database operations succeed or none do.
     def create(self, validated_data):
-        # 1. Separate the nested table type data from the main restaurant data.
         setup_data = validated_data.pop('setup')
         table_types_data = validated_data.pop('table_types')
         operating_hours_data = validated_data.pop('operating_hours')
         owner_user = self.context['request'].user
 
-        # 2. Create the main Restaurant object with its base rules.
         restaurant = Restaurant.objects.create(owner=owner_user, **validated_data)
 
-        # 3. Create the linked RestaurantSetup object.
         setup = RestaurantSetup.objects.create(restaurant=restaurant, **setup_data)
 
-        # 4. Loop through the list of table type data and create each one.
         for table_type_data in table_types_data:
             TableType.objects.create(setup=setup, **table_type_data)
 
@@ -330,7 +326,6 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
 
         return instance
 
-# FAVOURITE RESTAURANT
 class FavouriteRestaurantListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='restaurant.id', read_only=True)
     name = serializers.CharField(source='restaurant.name', read_only=True)

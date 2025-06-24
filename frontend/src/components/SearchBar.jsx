@@ -7,7 +7,6 @@ function SearchBar({ query, setQuery }) {
     <header className="bg-gradient-to-r from-white to-amber-50 dark:from-amber-500 dark:to-amber-600 shadow-lg border-b border-amber-100 dark:border-amber-400 sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4">
         <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0 lg:space-x-8">
-          {/* Logo and View Toggle Section */}
           <div className="flex items-center space-x-6">
             <div className="flex-shrink-0">
               <Logo />
@@ -41,7 +40,6 @@ function SearchBar({ query, setQuery }) {
             </div>
           </div>
 
-          {/* Search Section */}
           <div className="w-full lg:w-auto lg:flex-grow lg:max-w-md xl:max-w-lg">
             <div className="relative">
               <Search query={query} setQuery={setQuery} />

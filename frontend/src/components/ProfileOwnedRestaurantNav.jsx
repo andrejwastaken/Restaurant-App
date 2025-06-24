@@ -21,7 +21,6 @@ function ProfileOwnedRestaurantNav() {
 
   return (
     <div className="relative w-full mt-10 border-b border-gray-200">
-      {/* Container for the clickable NavLinks */}
       <div className="flex">
         {navItems.map((item) => (
           <NavLink
@@ -33,8 +32,8 @@ function ProfileOwnedRestaurantNav() {
               `flex-1 py-4 px-1 text-center font-medium text-sm transition-colors duration-300 focus:outline-none
               ${
                 isActive
-                  ? "text-amber-600" // Active text color
-                  : "text-gray-500 hover:text-gray-700" // Inactive text color
+                  ? "text-amber-600"
+                  : "text-gray-500 hover:text-gray-700"
               }`
             }
           >
@@ -42,7 +41,6 @@ function ProfileOwnedRestaurantNav() {
           </NavLink>
         ))}
       </div>
-      {/* The sliding underline element */}
       <div
         className="absolute bottom-0 h-0.5 bg-amber-500 transition-transform duration-300 ease-in-out"
         style={{

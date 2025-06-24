@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from reservations.models import Reservation
-# from restaurants.serializers import TableSerializer
 from users.serializers import NestedUserSerializer
 
 class ReservationListSerializer(serializers.ModelSerializer):

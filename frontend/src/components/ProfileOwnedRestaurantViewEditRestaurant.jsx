@@ -130,7 +130,7 @@ function ProfileOwnedRestaurantViewEditRestaurant() {
       toast.success("Restaurant and floor plan added successfully!");
     } catch (error) {
       const errorMessage =
-        error.response?.data?.detail || "An error occurred during the update.";
+        error.response?.data?.name || "An error occurred during the update.";
       toast.error(errorMessage);
     } finally {
       handleLoadingDuringSaveEdit(false);

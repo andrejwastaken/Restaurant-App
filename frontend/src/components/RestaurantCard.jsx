@@ -20,7 +20,7 @@ export default function RestaurantCard({ restaurant }) {
             state={{ restaurant }}
             className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-2.5 px-6 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
           >
-            Book Now
+            View Details
           </Link>
         </div>
       </div>

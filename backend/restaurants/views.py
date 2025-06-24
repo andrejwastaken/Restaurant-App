@@ -132,7 +132,6 @@ class GeocodeView(APIView):
         if not address:
             return Response({'error': 'Address is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Since your app is only for Skopje, adding it to the query improves results
         geolocator = Nominatim(user_agent="skopje_restaurant_app")
         try:
             location = geolocator.geocode(f"{address}, Skopje, North Macedonia")
@@ -352,7 +351,6 @@ class SpecialDayDeleteAPIView(APIView):
             setup__restaurant__owner=request.user
         )
 
-        # Delete the object
         special_day.delete()
 
         # Return a success response. HTTP 204 means "No Content" and is standard for successful deletes.

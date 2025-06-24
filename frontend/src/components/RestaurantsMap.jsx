@@ -76,7 +76,6 @@ function RestaurantsMap() {
           <FlyToMarker position={singleResultPosition} />
         </MapContainer>
       )}
-      {/* A message for when no results are found */}
       {!isLoading && !error && filteredRestaurants.length === 0 && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-[1000]">
           <p className="text-center text-amber-600 text-lg font-semibold">

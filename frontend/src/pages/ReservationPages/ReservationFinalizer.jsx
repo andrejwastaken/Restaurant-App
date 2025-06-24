@@ -9,7 +9,6 @@ const Finalizer = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const reservationDetails = location.state;
-	console.log(reservationDetails);
 	if (!reservationDetails) {
 		return (
 			<div className="flex flex-col items-center justify-center h-screen bg-gray-50 text-red-600">
@@ -25,6 +24,8 @@ const Finalizer = () => {
 	}
 	const restaurant_id = reservationDetails.restaurant_id
 	const reservation_id = reservationDetails.reservation_id;
+	// if you want to try the qr code, put in your actual ip address here
+	// e.g. const qrCodeValue = "http://<your_ip_address:port>/user/owned-restaurants/" +restaurant_id + "/reservations/" + reservation_id;
 	const qrCodeValue = "http://localhost:3000/user/owned-restaurants/" +restaurant_id + "/reservations/" + reservation_id;
 
 	// We use a public QR code generation API to avoid needing a library.

@@ -30,7 +30,6 @@ export function AuthProvider({ children }) {
 			}
 		} catch (error) {
 			setIsAuthorized(false);
-			console.log(error);
 		}
 	}, []);
 

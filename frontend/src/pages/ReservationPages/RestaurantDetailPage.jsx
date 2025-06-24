@@ -33,16 +33,16 @@ function RestaurantDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
 
   const toggleLike = async () => {
-    // setIsLiked(!isLiked);
     try {
-      let response;
       if (!isLiked == true) {
         await api.post(`api/favourite-restaurant/toggle/${restaurantId}/`);
       } else {
         await api.delete(`api/favourite-restaurant/toggle/${restaurantId}/`);
       }
     } catch (err) {
-      console.log(error);
+      console.error("Error toggling favorite status:", err);
+      toast.error("Failed to update favorite status. Please try again.");
+      return;
     } finally {
       setIsLiked(!isLiked);
     }
@@ -108,7 +108,6 @@ function RestaurantDetailPage() {
           </div>
         ) : (
           <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl p-8 transform transition-all hover:scale-[1.01]">
-            {/* Heart Icon Button */}
             {isAuthorized && (
               <button
                 onClick={toggleLike}
@@ -145,15 +144,12 @@ function RestaurantDetailPage() {
               {restaurant.name}
             </h1>
 
-            {/* Restaurant Description */}
             <p className="text-lg text-gray-600 text-center mb-8">
               {restaurant.description}
             </p>
 
-            {/* Details Section */}
             <div className="space-y-4 border-t border-gray-200 pt-6">
               <div className="flex items-center">
-                {/* Using the InfoIcon component for the phone */}
                 <InfoIcon>
                   <path
                     strokeLinecap="round"
@@ -165,7 +161,6 @@ function RestaurantDetailPage() {
                 <span className="text-gray-700">{restaurant.phone_number}</span>
               </div>
               <div className="flex items-center">
-                {/* Using the InfoIcon component for the address */}
                 <InfoIcon>
                   <path
                     strokeLinecap="round"
@@ -184,7 +179,6 @@ function RestaurantDetailPage() {
               </div>
             </div>
 
-            {/* Action Button */}
             <div className="mt-10 text-center">
               {isAuthorized ? (
                 <NavLink

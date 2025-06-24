@@ -27,7 +27,6 @@ function ProfileMenuSideBar() {
 
   return (
     <div className="bg-white flex flex-col shadow-md overflow-y-auto flex-grow">
-      {/* Name Box */}
       <div className="p-6 mt-1">
         <div className="flex flex-col items-center text-center space-y-2.5">
           <h5 className="text-2xl font-semibold text-gray-800">
@@ -39,8 +38,6 @@ function ProfileMenuSideBar() {
 
       <hr className="w-full border-t-2 border-gray-200 my-1" />
 
-      {/*  */}
-      {/* Buttons */}
       <div className="px-6 pb-6 pt-2">
         <nav className="flex flex-col">
           <NavLink
@@ -78,7 +75,6 @@ function ProfileMenuSideBar() {
         </nav>
       </div>
 
-      {/* Line */}
       <hr className="w-full border-t-2 border-gray-200 my-1" />
 
       <div className="px-6 pb-6 pt-3">
@@ -107,7 +103,6 @@ function ProfileMenuSideBar() {
         </nav>
       </div>
 
-      {/* Line */}
       <hr className="w-full border-t-2 border-gray-200 my-1" />
 
       <div className="px-6 pb-6 pt-3">

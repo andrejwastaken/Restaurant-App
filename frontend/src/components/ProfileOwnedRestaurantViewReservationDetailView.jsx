@@ -164,7 +164,7 @@ function ProfileOwnedRestaurantViewReservationDetailView({
           {isCancelling ? (
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            "Decline Reservation"
+            "Cancel Reservation"
           )}
         </button>
       </div>

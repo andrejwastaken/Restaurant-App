@@ -63,7 +63,6 @@ function RestaurantFormTableSetup({
                   <option value="rectangle">Rectangle</option>
                   <option value="circle">Circle</option>
                 </select>
-                {/* This is the custom arrow icon */}
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                   <svg
                     className="h-5 w-5 fill-current"
@@ -100,7 +99,6 @@ function RestaurantFormTableSetup({
                     </option>
                   ))}
                 </select>
-                {/* This is the custom arrow icon */}
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                   <svg
                     className="h-5 w-5 fill-current"

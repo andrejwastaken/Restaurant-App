@@ -81,10 +81,8 @@ function ReservationBookingTablesView({
         `/api/reservations/create-reservation/`,
         reservationData
       );
-      console.log("Reservation response:", response);
       if (response.status === 200 || response.status === 201) {
         toast.success("Reservation successful!");
-        console.log(response.data);
 
         navigate("/confirm-booking", {
           state: {

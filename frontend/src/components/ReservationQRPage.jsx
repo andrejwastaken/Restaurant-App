@@ -56,9 +56,12 @@ function ReservationQrPage() {
   }
 
   const { date, time } = formatDateTime(reservation.start_time);
-  const ip = window.location.hostname;
-  console.log(ip);
-  const qrCodeValue = `http://192.168.144.66:3000/user/owned-restaurants/${restaurantId}/reservations/${reservationId}`;
+  // one way to ge the IP address is to use the window.location.hostname
+  // const ip = window.location.hostname;
+  // console.log(ip);
+  // if you want to try the qr code, put in your actual ip address here
+	// e.g. const qrCodeValue = "http://<your_ip_address:port>/user/owned-restaurants/" +restaurant_id + "/reservations/" + reservation_id;
+  const qrCodeValue = `http://localhost:3000/user/owned-restaurants/${restaurantId}/reservations/${reservationId}`;
   const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
     qrCodeValue
   )}&ecc=H&margin=10`;
@@ -150,7 +153,7 @@ function ReservationQrPage() {
             {isCancelling ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              "Decline Reservation"
+              "Cancel Reservation"
             )}
           </button>
         </div>

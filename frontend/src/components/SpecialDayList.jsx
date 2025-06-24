@@ -11,9 +11,6 @@ function SpecialDayList({
 }) {
   return (
     <div className="w-full h-full flex flex-col">
-      {/* Fixed Title */}
-
-      {/* Scrollable Content Area */}
       <div className="flex-grow overflow-y-auto pt-6 pr-1">
         {specialDays.length > 0 ? (
           <div className="space-y-3">

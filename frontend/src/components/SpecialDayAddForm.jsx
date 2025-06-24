@@ -19,7 +19,6 @@ function SpecialDayAddForm({
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/* Form fields in a scrollable area */}
       <div className="w-full mt-6 flex-grow overflow-y-auto space-y-4 pr-1">
         <LabelInputField
           label="Date"

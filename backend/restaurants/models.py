@@ -4,7 +4,6 @@ from users.models import User
 class OwnerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
-# MODEL 1: RESTAURANT (For lightweight API call)
 # This model only holds basic, mostly static information.
 class Restaurant(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -20,7 +19,6 @@ class Restaurant(models.Model):
     def __str__(self):
         return self.name
     
-# MODEL 2: RESTAURANT SETUP (The hub for your heavy, real-time API call)
 # This links all the complex configuration to a restaurant.
 class RestaurantSetup(models.Model):
     restaurant = models.OneToOneField(
@@ -36,7 +34,6 @@ class RestaurantSetup(models.Model):
     def __str__(self):
         return f'Setup for {self.restaurant.name}'
     
-# MODEL 3: TABLE TYPE (Defines the restaurant's resources)
 # An owner first defines the types of tables they have.
 class TableType(models.Model):
     setup = models.ForeignKey(
@@ -161,7 +158,6 @@ class SpecialDay(models.Model):
     def __str__(self):
         return f'{self.day} {self.open_time} {self.close_time}'
 
-# MANY TO MANY
 class FavouriteRestaurant(models.Model):
     user = models.ForeignKey(
         User,

@@ -31,7 +31,8 @@ SECRET_KEY = 'django-insecure-s5osrl^l(_2k3s$=j*a!5sve@#ki+wwzksbdp^nwx@+-lvdcwy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.144.66']
+# If you want to try the qr code, either allow all hosts or specify the host
+ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
