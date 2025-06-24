@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueValidator
 from django.db import transaction
 
 from reservations.models import Reservation
-from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay
+from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay, FavouriteRestaurant
 
 from reservations.serializers import ReservationListSerializer
 
@@ -286,6 +286,17 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
             'name': {'validators': []},
         }
 
+    def validate_name(self, value):
+        query = Restaurant.objects.filter(name__iexact=value)
+
+        if self.instance:
+            query = query.exclude(pk=self.instance.pk)
+
+        if query.exists():
+            raise serializers.ValidationError("A restaurant with that name already exists!")
+
+        return value
+
     @transaction.atomic
     def update(self, instance, validated_data):
         setup = instance.setup
@@ -318,6 +329,15 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
             TableType.objects.bulk_create(types_to_create)  # Create all new types
 
         return instance
+
+# FAVOURITE RESTAURANT
+class FavouriteRestaurantListSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='restaurant.id', read_only=True)
+    name = serializers.CharField(source='restaurant.name', read_only=True)
+
+    class Meta:
+        model = FavouriteRestaurant
+        fields = ['id', 'name']
 
 
 

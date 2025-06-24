@@ -129,10 +129,6 @@ function ProfileOwnedRestaurantViewEditRestaurant() {
 
       toast.success("Restaurant and floor plan added successfully!");
     } catch (error) {
-      console.error(
-        "Failed to update restaurant:",
-        error.response?.data || error
-      );
       const errorMessage =
         error.response?.data?.detail || "An error occurred during the update.";
       toast.error(errorMessage);

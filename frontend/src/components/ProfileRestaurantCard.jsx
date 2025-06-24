@@ -1,9 +1,13 @@
 import { NavLink } from "react-router-dom";
 
-function ProfileRestaurantCard({ restaurant }) {
+function ProfileRestaurantCard({ restaurant, type = "profileOwned" }) {
   return (
     <NavLink
-      to={`${restaurant.id}`}
+      to={
+        type === "profileOwned"
+          ? `${restaurant.id}`
+          : `/restaurants/${restaurant.id}`
+      }
       className="w-full bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-amber-500 transition-all duration-300 ease-in-out cursor-pointer flex items-center justify-between group"
     >
       {/* Left side: Icon and Name */}
@@ -26,7 +30,7 @@ function ProfileRestaurantCard({ restaurant }) {
         </div>
         <div>
           <h3 className="text-lg font-bold text-gray-800">{restaurant.name}</h3>
-          <p className="text-sm text-gray-500">Click to edit or view details</p>
+          <p className="text-sm text-gray-500">Click to view details</p>
         </div>
       </div>
 

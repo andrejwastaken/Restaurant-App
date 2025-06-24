@@ -1,5 +1,4 @@
 import ReservationCard from "./ReservationCard";
-import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
 
 function ReservationsList({
   reservations,
@@ -11,6 +10,19 @@ function ReservationsList({
   onCurrentPage,
   onViewMode,
 }) {
+  const getStatusColorClass = (status) => {
+    switch (status) {
+      case "CONFIRMED":
+        return "text-green-600";
+      case "PENDING":
+        return "text-yellow-600";
+      case "CANCELLED":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
+    }
+  };
+
   const reservationsArray = Array.isArray(reservations) ? reservations : [];
 
   const handleNextPage = () => {
@@ -30,8 +42,7 @@ function ReservationsList({
               <ReservationCard
                 key={reservation.id}
                 reservation={reservation}
-                onClick={() => onViewReservation(reservation.id)}
-                viewType = "owner"
+                disabled={reservation.status === "CANCELLED"}
               />
             ))}
           </div>

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useParams, NavLink } from "react-router-dom";
+import { useParams, NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Heart } from "lucide-react";
 
+import api from "../../api/api";
 import RestaurantReservationDataContext from "../../contexts/RestaurantReservationDataContext";
 import Loading from "../../components/Loading";
+import toast from "react-hot-toast";
 
 const InfoIcon = ({ children }) => (
   <svg
@@ -27,6 +29,41 @@ function RestaurantDetailPage() {
   const [restaurant, setRestaurant] = useState(null);
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [isLiked, setIsLiked] = useState(false);
+
+  const toggleLike = async () => {
+    // setIsLiked(!isLiked);
+    try {
+      let response;
+      if (!isLiked == true) {
+        await api.post(`api/favourite-restaurant/toggle/${restaurantId}/`);
+      } else {
+        await api.delete(`api/favourite-restaurant/toggle/${restaurantId}/`);
+      }
+    } catch (err) {
+      console.log(error);
+    } finally {
+      setIsLiked(!isLiked);
+    }
+  };
+
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      try {
+        const response = await api.get(
+          `api/favourite-restaurant/toggle/${restaurantId}/`
+        );
+        setIsLiked(response.data.is_favorited);
+      } catch (err) {
+        console.error("Error checking favorite status:", err);
+      }
+    };
+
+    if (isAuthorized) {
+      checkFavoriteStatus();
+    }
+  }, [restaurantId, isAuthorized]);
 
   useEffect(() => {
     const fetchRestaurantDetails = async () => {
@@ -70,7 +107,30 @@ function RestaurantDetailPage() {
             <p className="text-gray-600 mt-2">{error}</p>
           </div>
         ) : (
-          <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl p-8 transform transition-all hover:scale-[1.01]">
+          <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl p-8 transform transition-all hover:scale-[1.01]">
+            {/* Heart Icon Button */}
+            <button
+              onClick={toggleLike}
+              className={`absolute top-4 right-4 p-2 rounded-full border transition-all 
+              ${
+                isLiked
+                  ? "bg-red-100 border-red-200"
+                  : "bg-white border-gray-200"
+              }
+              hover:scale-110 hover:shadow-md focus:outline-none focus:ring-2 
+              ${isLiked ? "focus:ring-red-300" : "focus:ring-gray-300"}`}
+              aria-label="Like restaurant"
+            >
+              <Heart
+                className={`w-6 h-6 transition-all duration-200 ease-in-out 
+                ${
+                  isLiked
+                    ? "text-red-500 fill-current drop-shadow-[0_0_4px_rgba(239,68,68,0.5)]"
+                    : "text-gray-500"
+                }`}
+              />
+            </button>
+
             <button
               onClick={() => navigate(-1)}
               className="p-2 mr-4 text-gray-600 bg-white rounded-full hover:bg-gray-100 border border-gray-200 transition-colors"

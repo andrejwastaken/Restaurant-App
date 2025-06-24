@@ -13,7 +13,7 @@ class ReservationListSerializer(serializers.ModelSerializer):
         read_only=True, 
         help_text="Details of the user who made the reservation."
     )
-    
+
     table = serializers.SerializerMethodField()
 
     restaurant_id = serializers.IntegerField(

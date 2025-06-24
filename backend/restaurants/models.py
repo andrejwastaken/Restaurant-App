@@ -160,3 +160,33 @@ class SpecialDay(models.Model):
 
     def __str__(self):
         return f'{self.day} {self.open_time} {self.close_time}'
+
+# MANY TO MANY
+class FavouriteRestaurant(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favourite_restaurants',
+        help_text="The user who favourited the restaurant."
+    )
+    restaurant = models.ForeignKey(
+        Restaurant,
+        on_delete=models.CASCADE,
+        related_name='favorited_by',
+        help_text="The restaurant that was favourited."
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="The date and time when the restaurant was favourited."
+    )
+
+    class Meta:
+        unique_together = ('user', 'restaurant')
+
+        ordering = ['-created_at']
+
+        verbose_name = 'Favourite Restaurant'
+        verbose_name_plural = 'Favourite Restaurants'
+
+    def __str__(self):
+        return f'{self.user.username} favorited {self.restaurant.name}'

@@ -12,7 +12,7 @@ import Login from "./pages/LoginRegisterPages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/UserManagementPages/ProfilePage";
 import ProfilePersonalInfo from "./components/ProfilePersonalInfo";
-import ProfileReservationHistory from "./components/ProfileReservationHistory";
+import ProfileYourReservations from "./components/ProfileYourReservations.jsx";
 import ProfileFavouriteRestaurants from "./components/ProfileFavouriteRestaurants";
 import ProfileOwnedRestaurants from "./components/ProfileOwnedRestaurants";
 import ProfileOwnedRestaurantView from "./components/ProfileOwnedRestaurantView";
@@ -57,7 +57,11 @@ const router = createBrowserRouter([
         children: [
           {
             path: "book",
-            element: <ReservationBooking />,
+            element: (
+              <ProtectedRoute>
+                <ReservationBooking />
+              </ProtectedRoute>
+            ),
           },
         ],
       },
@@ -101,7 +105,7 @@ const router = createBrowserRouter([
       },
       {
         path: "your-reservations",
-        element: <ProfileReservationHistory />,
+        element: <ProfileYourReservations />,
       },
       {
         path: "your-reservations/:reservationId",

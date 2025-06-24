@@ -42,7 +42,7 @@ function ReservationCard({
       tabIndex={disabled ? -1 : 0}
       style={disabled ? { pointerEvents: "none", opacity: 0.6 } : undefined}
     >
-      <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-amber-500 cursor-pointer transition-all duration-200 ease-in-out">
+      <div className="mt-1 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-amber-500 cursor-pointer transition-all duration-200 ease-in-out">
         <div className="flex justify-between items-start">
           <div className="flex-grow space-y-1">
             <p

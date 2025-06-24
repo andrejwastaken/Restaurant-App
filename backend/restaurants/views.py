@@ -2,9 +2,10 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay
+from .models import Restaurant, RestaurantSetup, TableType, Table, OperationHours, SpecialDay, FavouriteRestaurant
 from .serializers import RestaurantSerializer, RestaurantCreateWithSetupSerializer, TableBulkCreateSerializer, \
-    OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer, TableSerializer, SpecialDaySerializer
+    OwnedRestaurantDetailSerializer, RestaurantUpdateSerializer, TableSerializer, SpecialDaySerializer, \
+    FavouriteRestaurantListSerializer
 from datetime import datetime, timedelta
 from django.shortcuts import get_object_or_404
 from geopy.geocoders import Nominatim
@@ -99,7 +100,7 @@ class UpdateRestaurantView(APIView):
             return Response({"message": "Restaurant profile updated successfully."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class OwnedRestaurantsListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -356,4 +357,82 @@ class SpecialDayDeleteAPIView(APIView):
 
         # Return a success response. HTTP 204 means "No Content" and is standard for successful deletes.
         return Response({"message": "Special day deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-        
+
+
+class ToggleFavouriteRestaurantView(APIView):
+    """
+    A view to add or remove a restaurant from a user's favourites.
+    - POST: Adds the restaurant to favourites.
+    - DELETE: Removes the restaurant from favourites.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, restaurant_id):
+        """Check if restaurant is favourited by user"""
+        restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
+        is_favorited = FavouriteRestaurant.objects.filter(
+            user=request.user,
+            restaurant=restaurant
+        ).exists()
+
+        return Response({
+            'is_favorited': is_favorited,
+            'restaurant_id': restaurant_id
+        })
+
+    def post(self, request, restaurant_id):
+        """Add to favourites"""
+        user = request.user
+        restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
+
+        favourite, created = FavouriteRestaurant.objects.get_or_create(
+            user=user,
+            restaurant=restaurant
+        )
+
+        return Response({
+            'is_favorited': True,
+            'message': "Restaurant added to favourites."
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+    def delete(self, request, restaurant_id):
+        """Remove from favourites"""
+        user = request.user
+        restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
+
+        deleted_count, _ = FavouriteRestaurant.objects.filter(
+            user=user,
+            restaurant=restaurant
+        ).delete()
+
+        if deleted_count > 0:
+            return Response({
+                'is_favorited': False,
+                'message': "Restaurant removed from favourites."
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'is_favorited': False,
+            'message': "Restaurant was not in favourites."
+        }, status=status.HTTP_404_NOT_FOUND)
+
+
+class ListUserFavouritesView(APIView):
+    """
+    Returns a list of all favourite restaurants for the currently
+    authenticated user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """
+        This view should return a list of all the favourites
+        for the currently authenticated user.
+        """
+        favourite_restaurants = FavouriteRestaurant.objects.filter(
+            user=request.user
+        )
+
+        serializer = FavouriteRestaurantListSerializer(favourite_restaurants, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
