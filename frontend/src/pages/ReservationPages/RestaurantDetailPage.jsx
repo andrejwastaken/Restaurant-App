@@ -109,9 +109,10 @@ function RestaurantDetailPage() {
         ) : (
           <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl p-8 transform transition-all hover:scale-[1.01]">
             {/* Heart Icon Button */}
-            <button
-              onClick={toggleLike}
-              className={`absolute top-4 right-4 p-2 rounded-full border transition-all 
+            {isAuthorized && (
+              <button
+                onClick={toggleLike}
+                className={`absolute top-4 right-4 p-2 rounded-full border transition-all 
               ${
                 isLiked
                   ? "bg-red-100 border-red-200"
@@ -119,17 +120,18 @@ function RestaurantDetailPage() {
               }
               hover:scale-110 hover:shadow-md focus:outline-none focus:ring-2 
               ${isLiked ? "focus:ring-red-300" : "focus:ring-gray-300"}`}
-              aria-label="Like restaurant"
-            >
-              <Heart
-                className={`w-6 h-6 transition-all duration-200 ease-in-out 
+                aria-label="Like restaurant"
+              >
+                <Heart
+                  className={`w-6 h-6 transition-all duration-200 ease-in-out 
                 ${
                   isLiked
                     ? "text-red-500 fill-current drop-shadow-[0_0_4px_rgba(239,68,68,0.5)]"
                     : "text-gray-500"
                 }`}
-              />
-            </button>
+                />
+              </button>
+            )}
 
             <button
               onClick={() => navigate(-1)}
