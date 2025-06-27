@@ -3,25 +3,10 @@ import ReservationCard from "./ReservationCard";
 function ReservationsList({
   reservations,
   currentReservations,
-  onViewReservation,
-  onAddReservation,
   totalPages,
   currentPage,
   onCurrentPage,
-  onViewMode,
 }) {
-  const getStatusColorClass = (status) => {
-    switch (status) {
-      case "CONFIRMED":
-        return "text-green-600";
-      case "PENDING":
-        return "text-yellow-600";
-      case "CANCELLED":
-        return "text-red-600";
-      default:
-        return "text-gray-600";
-    }
-  };
 
   const reservationsArray = Array.isArray(reservations) ? reservations : [];
 

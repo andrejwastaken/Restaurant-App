@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
 import ProfileRestaurantCard from "./ProfileRestaurantCard";
 
 function ProfileFavouriteRestaurantsList({ restaurants }) {

@@ -80,7 +80,6 @@ function ProfileOwnedRestaurantViewEditRestaurant() {
     }
 
     try {
-      // --- Step 1: Prepare and send the Profile update ---
       const formattedOperatingHours = newData.setup.operating_hours.map(
         (hour) => ({
           day_of_week: hour.day_of_week,
@@ -108,8 +107,6 @@ function ProfileOwnedRestaurantViewEditRestaurant() {
 
       toast.success("Profile updated successfully!");
 
-      // --- Step 2: Prepare and send the Tables (Floor Plan) update ---
-      // The tables from the context are already in the correct backend format.
       const tablesPayload = newData.setup.tables.map((table) => ({
         name: table.name,
         table_type_name: table.table_type,

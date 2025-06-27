@@ -1,6 +1,5 @@
 import { useProfileData } from "../contexts/ProfileDataContext";
 
-import PersonalInfoLabel from "./PersonalInfoLabel";
 
 function RestaurantFormBasicViewContent({
   name,

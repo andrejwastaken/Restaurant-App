@@ -44,6 +44,9 @@ function RestaurantFormAddressConfiguration() {
         latitude: currentAddress.latitude,
       },
     };
+
+    toast.success("Address updated successfully!");
+
     handleSaveAddRestaurantItem(newAddressData);
   };
 
@@ -124,7 +127,7 @@ function RestaurantFormAddressConfiguration() {
         <RestaurantFormAddressSidebar
           currentAddress={currentAddress}
           onChangeAddress={handleAddressChange}
-          isGeocoding={isGeocoding}
+          isGeocoding={isGeocoding || isReverseGeocoding}
           onGeocode={handleGeocode}
           onSave={handleSave}
         />

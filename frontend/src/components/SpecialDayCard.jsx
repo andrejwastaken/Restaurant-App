@@ -1,5 +1,4 @@
 function SpecialDayCard({ specialDay, onClick }) {
-  // A simple formatter for the date to make it more readable
   const formattedDate = new Date(specialDay.day).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

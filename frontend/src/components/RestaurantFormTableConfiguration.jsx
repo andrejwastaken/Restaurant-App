@@ -7,18 +7,6 @@ import { useProfileData } from "../contexts/ProfileDataContext";
 import toast from "react-hot-toast";
 import RestaurantFormTableSetup from "./RestaurantFormTableSetup";
 
-const initialTableData = {
-  table_type: "",
-  name: "",
-  isSmoking: false,
-
-  shape: "rectangle",
-  x: -1,
-  y: -1,
-  width: -1,
-  height: -1,
-  radius: -1,
-};
 
 function checkRectVsRect(rect1, rect2) {
   if (!rect1 || !rect2 || rect1.width <= 0 || rect2.width <= 0) return false;
@@ -120,7 +108,7 @@ function RestaurantFormTableConfiguration() {
 
   const handleTableSelect = (pos, eventType) => {
     if (eventType === "down") {
-      // MORA DA IMA TABLETYPE PRED TABLE DA STAVA
+      // Table type must be made before making the table configuration
       if (!tableTypesInformation || tableTypesInformation.length === 0) {
         toast.error(
           "Table type must be made before making the table configuration!"

@@ -211,7 +211,7 @@ class RestaurantAvailabilityAPIView(APIView):
         party_size_str = request.query_params.get('party_size')
         duration_str = request.query_params.get('duration', '120') 
         is_smoker_str = request.query_params.get('is_smoker', 'false')
-
+        
         if not all([date_str, time_str, party_size_str]):
             return Response({'error': 'Missing required parameters: date, time, party_size'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -236,10 +236,7 @@ class RestaurantAvailabilityAPIView(APIView):
         if special_day:
             effective_op_hours = special_day
         else:
-            python_weekday = request_date.weekday()  # Monday=0, ..., Sunday=6
-            weekday_map = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 0}
-            db_day_of_week = weekday_map[python_weekday]
-
+            db_day_of_week = request_date.weekday()
             try:
                 effective_op_hours = OperationHours.objects.get(setup=setup, day_of_week=db_day_of_week)
             except OperationHours.DoesNotExist:

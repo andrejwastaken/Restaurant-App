@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import { useRestaurantReservationData } from "../contexts/RestaurantReservationDataContext";
 
 import ReservationBookingCalendar from "./ReservationBookingCalendar";
@@ -9,7 +8,6 @@ import Loading from "./Loading";
 import ReservationBookingTablesView from "./ReservationBookingTablesView";
 
 function ReservationBooking() {
-  const navigate = useNavigate();
   const { restaurantData } = useRestaurantReservationData();
 
   if (!restaurantData) {

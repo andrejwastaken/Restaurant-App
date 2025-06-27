@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 function ModalShell({ title, children, onClose }) {
   // State to control the visibility for the animation

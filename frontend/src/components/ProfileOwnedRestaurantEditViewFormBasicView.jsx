@@ -1,7 +1,4 @@
 import { useState, useEffect } from "react";
-
-import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
-import RestaurantFormBasicViewContent from "./RestaurantFormBasicViewContent";
 import ProfileOwnedRestaurantEditViewFormBasicViewContent from "./ProfileOwnedRestaurantEditViewFormBasicViewContent";
 import { useProfileData } from "../contexts/ProfileDataContext";
 

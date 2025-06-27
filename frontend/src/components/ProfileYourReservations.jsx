@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import ReservationCard from "./ReservationCard";
 import api from "../api/api";
 import Loading from "./Loading";
 import ProfileMenuContentTitle from "./ProfileMenuContentTitle";

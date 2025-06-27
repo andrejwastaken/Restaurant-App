@@ -1,7 +1,3 @@
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-
-import api from "../api/api";
 import RestaurantLocationPicker from "./Map";
 
 function RestaurantFormAddressMap({ currentAddress, onPositionChange }) {

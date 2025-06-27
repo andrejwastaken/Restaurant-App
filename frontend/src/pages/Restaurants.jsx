@@ -14,8 +14,7 @@ function Restaurants() {
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [query, setQuery] = useState("");
-  const [isListSelected, setListSelected] = useState(false);
+  const [query, setQuery] = useState("");;
 
   const [allRestaurants, setAllRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);

@@ -14,8 +14,6 @@ function ProfileOwnedRestaurantView() {
     currentOwnedRestaurant,
     handleCurrentOwnedRestaurant,
     handleCurrentOwnedRestaurantSubmitCheck,
-    loadingDuringSaveEdit,
-    handleLoadingDuringSaveEdit,
   } = useProfileData();
 
   const [isLoading, setIsLoading] = useState(false);

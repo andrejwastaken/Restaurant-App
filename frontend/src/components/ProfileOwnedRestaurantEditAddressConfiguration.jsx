@@ -37,13 +37,13 @@ function ProfileOwnedRestaurantEditAddressConfiguration() {
       toast.error("You need to find your restaurant on the map");
       return;
     }
-
     const newAddressData = {
       ...currentOwnedRestaurant,
       address: currentAddress.address,
       longitude: currentAddress.longitude,
       latitude: currentAddress.latitude,
     };
+    toast.success("Address updated successfully!");
     handleCurrentOwnedRestaurant(newAddressData);
   };
 
@@ -124,7 +124,7 @@ function ProfileOwnedRestaurantEditAddressConfiguration() {
         <RestaurantFormAddressSidebar
           currentAddress={currentAddress}
           onChangeAddress={handleAddressChange}
-          isGeocoding={isGeocoding}
+          isGeocoding={isGeocoding || isReverseGeocoding}
           onGeocode={handleGeocode}
           onSave={handleSave}
         />

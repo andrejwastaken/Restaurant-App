@@ -1,12 +1,5 @@
 const ReservationInformation = ({ reservation }) => {
-    const { restaurant, reservationDate, duration, number_of_guests, table } = reservation;
-
-    // Format the duration in a human-readable way
-    const formatDuration = (duration) => {
-        const hours = Math.floor(duration / 60);
-        const minutes = duration % 60;
-        return `${hours}h ${minutes}m`;
-    };
+    const { restaurant, reservationDate, table } = reservation;
 
     if (!restaurant || !reservationDate || !table) {
         return (

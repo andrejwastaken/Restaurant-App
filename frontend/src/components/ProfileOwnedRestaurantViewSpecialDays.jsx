@@ -2,9 +2,6 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useProfileData } from "../contexts/ProfileDataContext";
 import { useParams } from "react-router-dom";
-
-import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
-import SpecialDayCard from "./SpecialDayCard";
 import SpecialDayAddForm from "./SpecialDayAddForm";
 import SpecialDayDetailView from "./SpecialDayDetailView";
 import SpecialDayList from "./SpecialDayList";
@@ -16,20 +13,14 @@ function ProfileOwnedRestaurantViewSpecialDays() {
     useProfileData();
   const { restaurantId } = useParams();
 
-  // This state would typically live in a parent component
-  const [specialDays, setSpecialDays] = useState(
-    currentOwnedRestaurant?.setup?.special_days || []
-  );
+  const specialDays = currentOwnedRestaurant?.setup?.special_days || [];
 
-  // State to manage which view is active: 'list', 'adding', or 'viewing'
   const [viewMode, setViewMode] = useState("list");
   const [selectedDayId, setSelectedDayId] = useState(null);
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 3; // Using a fixed number for stable layout
+  const itemsPerPage = 3; 
 
-  // --- Derived State for Pagination ---
   const totalPages = Math.ceil(specialDays.length / itemsPerPage);
   const startIndex = currentPage * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -44,8 +35,6 @@ function ProfileOwnedRestaurantViewSpecialDays() {
 
   const handleChangeNewSpecialDay = (e) => {
     const { name, value } = e.target;
-
-    // Create the potential new state to validate against
     const newState = { ...newSpecialDay, [name]: value };
 
     setNewSpecialDay(newState);
@@ -160,7 +149,6 @@ function ProfileOwnedRestaurantViewSpecialDays() {
   }
 
   return (
-    // The main container, taking up the full available width and height.
     <div className="w-full h-full">{content}</div>
   );
 }

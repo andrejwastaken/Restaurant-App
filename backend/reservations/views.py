@@ -1,4 +1,4 @@
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, timedelta
 from django.db import transaction
 from django.utils import timezone 
 from .serializers import ReservationListSerializer
@@ -11,7 +11,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
-from restaurants.serializers import TableSerializer
 
 class ReservationCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]

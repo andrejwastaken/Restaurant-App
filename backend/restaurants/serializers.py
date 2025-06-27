@@ -9,15 +9,32 @@ from reservations.serializers import ReservationListSerializer
 
 
 class OperatingHoursNestedSerializer(serializers.ModelSerializer):
+    closes_next_day = serializers.BooleanField(read_only=True)
+
     def validate(self, data):
-        """Check if opening time is before closing"""
-        if data['open_time'] >= data['close_time']:
-            raise serializers.ValidationError("Closing time must be after opening time")
+        """
+        Custom validation to handle overnight hours.
+        """
+        open_time = data.get('open_time')
+        close_time = data.get('close_time')
+
+        if not open_time or not close_time:
+            # If for some reason times are not provided, let other validators handle it.
+            return data
+
+        is_overnight = close_time < open_time
+
+        # If it's NOT an overnight shift, then the closing time must be after the opening time.
+        if not is_overnight and close_time <= open_time:
+            raise serializers.ValidationError("For same-day hours, closing time must be after opening time.")
+
+        # that will be used to create the model instance.
+        data['closes_next_day'] = is_overnight
         return data
 
     class Meta:
         model = OperationHours
-        fields = ['day_of_week', 'open_time', 'close_time']
+        fields = ['day_of_week', 'open_time', 'close_time', 'closes_next_day']
 
 class RestaurantSerializer(serializers.ModelSerializer):
     default_slot_duration = serializers.IntegerField(source='setup.default_slot_duration', read_only=True)
@@ -85,23 +102,51 @@ class TableSerializer(serializers.ModelSerializer):
 
         return data
 
+# your_app/serializers.py
+
 class SpecialDaySerializer(serializers.ModelSerializer):
+    closes_next_day = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = SpecialDay
-        fields = ['id', 'day', 'open_time', 'close_time', 'description']
+        fields = ['id', 'day', 'open_time', 'close_time', 'closes_next_day', 'description']
         read_only_fields = ['id']
+
+    def validate(self, data):
+        """
+        Custom validation to handle overnight hours for special days.
+        """
+        open_time = data.get('open_time')
+        close_time = data.get('close_time')
+
+        if not open_time or not close_time:
+            return data
+
+        is_overnight = close_time < open_time
+
+        if not is_overnight and close_time <= open_time:
+            raise serializers.ValidationError("For same-day hours, closing time must be after opening time.")
+
+        data['closes_next_day'] = is_overnight
+        
+        return data
 
     def validate_day(self, value):
         setup = self.context['setup']
+        
+        instance = getattr(self, 'instance', None)
+        query = SpecialDay.objects.filter(setup=setup, day=value)
 
-        if SpecialDay.objects.filter(setup=setup, day=value).exists():
-            raise serializers.ValidationError("Special Day already exists")
+        if instance:
+            query = query.exclude(pk=instance.pk)
+
+        if query.exists():
+            raise serializers.ValidationError("A special day for this date already exists.")
 
         return value
 
     def create(self, validated_data):
         setup = self.context['setup']
-
         return SpecialDay.objects.create(setup=setup, **validated_data)
 
 class RestaurantCreateWithSetupSerializer(serializers.ModelSerializer):

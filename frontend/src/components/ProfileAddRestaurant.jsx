@@ -94,7 +94,6 @@ function ProfileAddRestaurant() {
           errorMessage = errorData.detail;
         } else if (typeof errorData === "object") {
           // Handles DRF validation errors like {"field_name": ["This field is required."]}
-          // We'll find and display the first error message.
           const firstErrorKey = Object.keys(errorData)[0];
           const firstErrorMessages = errorData[firstErrorKey];
           if (

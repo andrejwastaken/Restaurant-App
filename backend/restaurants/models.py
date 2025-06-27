@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import User
-
+from django.core.exceptions import ValidationError
 class OwnerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
@@ -127,13 +127,25 @@ class OperationHours(models.Model):
     )
     open_time = models.TimeField()
     close_time = models.TimeField()
-
+    closes_next_day = models.BooleanField(default=False, help_text="Does this time close the next day?")
     class Meta:
         # A specific table type can only have one entry for a given date and time.
         unique_together = ('setup', 'day_of_week', 'open_time', 'close_time')
         ordering = ['day_of_week', 'open_time']
         verbose_name='Operating Hour'
         verbose_name_plural='Operating Hours'
+
+    def clean(self):
+        # If it's not an overnight shift, close_time must be after open_time
+        if not self.closes_next_day and self.close_time <= self.open_time:
+            raise ValidationError(f"Closing time ({self.close_time}) must be after opening time ({self.open_time}) for same-day hours.")
+
+    def save(self, *args, **kwargs):
+        # Automatically determine if it closes the next day based on times
+        if self.open_time and self.close_time:
+            self.closes_next_day = self.close_time < self.open_time
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return (f'{self.get_day_of_week_display()}: '
@@ -152,7 +164,7 @@ class SpecialDay(models.Model):
 
     open_time = models.TimeField()
     close_time = models.TimeField()
-
+    closes_next_day = models.BooleanField(default=False, help_text="Does this time close the next day?")
     description = models.CharField(max_length=300)
 
     def __str__(self):

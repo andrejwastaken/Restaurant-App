@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-// A robust helper to format a Date object into 'YYYY-MM-DD' string IN UTC.
 const formatDateToYYYYMMDD_UTC = (date) => {
 	const year = date.getUTCFullYear();
 	const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
@@ -24,7 +23,6 @@ function ReservationBookingCalendar({
 }) {
 	const navigate = useNavigate();
 	const {
-		// This is now a 'YYYY-MM-DD' string or null
 		selectedDate,
 		selectedTimeSlot,
 		restaurantOperatingHours,
@@ -32,47 +30,41 @@ function ReservationBookingCalendar({
 		restaurantSpecialDays,
 	} = reservationCalendarData;
 
-	// Use a date object for calendar navigation, but always treat it as UTC
 	const [viewDate, setViewDate] = useState(
 		() => new Date(new Date().toISOString().split("T")[0] + "T00:00:00.000Z")
 	);
 	const [isTransitioning, setIsTransitioning] = useState(false);
 
-	const handleClick = () => {
-		// Pass the date string directly. No more Date objects between components.
-		const newDetailsData = {
-			selectedInitialDate: selectedDate, // 'YYYY-MM-DD'
-			selectedDay: new Date(`${selectedDate}T00:00:00.000Z`).getUTCDay(), // Pass UTC day for consistency if needed
-			selectedTimeSlot: selectedTimeSlot,
-			restaurantOperatingHours: restaurantOperatingHours,
-			restaurantTimeSlot: restaurantTimeSlot,
-			restaurantSpecialDays: restaurantSpecialDays,
-		};
-
-		onSetInitialDetailsData(newDetailsData);
-		onChangeViewForm("details");
-	};
-
-	const months = [
-		"January",
-		"February",
-		"March",
-		"April",
-		"May",
-		"June",
-		"July",
-		"August",
-		"September",
-		"October",
-		"November",
-		"December",
-	];
-	const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+	const months = useMemo(
+		() => [
+			"January",
+			"February",
+			"March",
+			"April",
+			"May",
+			"June",
+			"July",
+			"August",
+			"September",
+			"October",
+			"November",
+			"December",
+		],
+		[]
+	);
+	const daysOfWeek = useMemo(
+		() => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+		[]
+	);
 
 	const operatingHoursMap = useMemo(() => {
 		const map = new Map();
 		restaurantOperatingHours.forEach((h) =>
-			map.set(h.day_of_week, { open: h.open_time, close: h.close_time })
+			map.set(h.day_of_week, {
+				open: h.open_time,
+				close: h.close_time,
+				closesNextDay: h.closes_next_day,
+			})
 		);
 		return map;
 	}, [restaurantOperatingHours]);
@@ -83,56 +75,50 @@ function ReservationBookingCalendar({
 			map.set(d.day, {
 				open: d.open_time,
 				close: d.close_time,
+				closesNextDay: d.closes_next_day,
 				description: d.description,
 			})
 		);
 		return map;
 	}, [restaurantSpecialDays]);
 
-	// This function now parses the date string as UTC to get the correct day of the week.
 	const isOperatingDay = useCallback(
 		(dateString) => {
-			// Takes 'YYYY-MM-DD'
 			if (specialDaysMap.has(dateString)) return true;
-
-			const dateObj = new Date(`${dateString}T00:00:00.000Z`); // Treat as UTC
-			const dayOfWeek = dateObj.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-			const mondayBasedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to backend's 0=Mon
-
+			const dateObj = new Date(`${dateString}T00:00:00.000Z`);
+			const dayOfWeek = dateObj.getUTCDay();
+			const mondayBasedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 			return operatingHoursMap.has(mondayBasedDay);
 		},
 		[operatingHoursMap, specialDaysMap]
 	);
 
-	// In ReservationBookingCalendar.jsx
-
 	const timeSlots = useMemo(() => {
 		if (!selectedDate || !isOperatingDay(selectedDate)) return [];
 
+		let hoursInfo;
 		const specialDayInfo = specialDaysMap.get(selectedDate);
-		let hours;
 
 		if (specialDayInfo) {
-			hours = { open: specialDayInfo.open, close: specialDayInfo.close };
+			hoursInfo = specialDayInfo;
 		} else {
 			const dateObj = new Date(`${selectedDate}T00:00:00.000Z`);
 			const dayOfWeek = dateObj.getUTCDay();
 			const mondayBasedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-			hours = operatingHoursMap.get(mondayBasedDay);
+			hoursInfo = operatingHoursMap.get(mondayBasedDay);
 		}
 
-		if (!hours) return [];
+		if (!hoursInfo) return [];
 
 		const slots = [];
-		const [openHour, openMin] = hours.open.split(":").map(Number);
-		const [closeHour, closeMin] = hours.close.split(":").map(Number);
+		const [openHour, openMin] = hoursInfo.open.split(":").map(Number);
+		const [closeHour, closeMin] = hoursInfo.close.split(":").map(Number);
 
 		let startMinutes = openHour * 60 + openMin;
 		let endMinutes = closeHour * 60 + closeMin;
 
-		// FIX: Detect overnight hours and adjust the end time.
-		if (endMinutes <= startMinutes) {
-			endMinutes += 24 * 60; // Add 24 hours in minutes
+		if (hoursInfo.closesNextDay) {
+			endMinutes += 24 * 60;
 		}
 
 		const lastValidStartMinutes = endMinutes - restaurantTimeSlot;
@@ -142,10 +128,8 @@ function ReservationBookingCalendar({
 			currentMinutes <= lastValidStartMinutes;
 			currentMinutes += restaurantTimeSlot
 		) {
-			// FIX: Use modulo to correctly calculate the hour for times past midnight.
 			const hour = Math.floor((currentMinutes % (24 * 60)) / 60);
 			const minute = currentMinutes % 60;
-
 			slots.push(
 				`${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`
 			);
@@ -158,6 +142,19 @@ function ReservationBookingCalendar({
 		specialDaysMap,
 		restaurantTimeSlot,
 	]);
+
+	const handleClick = () => {
+		const newDetailsData = {
+			selectedInitialDate: selectedDate,
+			selectedDay: new Date(`${selectedDate}T00:00:00.000Z`).getUTCDay() - 1,
+			selectedTimeSlot: selectedTimeSlot,
+			restaurantOperatingHours: restaurantOperatingHours,
+			restaurantTimeSlot: restaurantTimeSlot,
+			restaurantSpecialDays: restaurantSpecialDays,
+		};
+		onSetInitialDetailsData(newDetailsData);
+		onChangeViewForm("details");
+	};
 
 	const handleMonthChange = (direction) => {
 		setIsTransitioning(true);
@@ -178,7 +175,6 @@ function ReservationBookingCalendar({
 			Date.UTC(viewDate.getUTCFullYear(), viewDate.getUTCMonth(), day)
 		);
 		const dateString = formatDateToYYYYMMDD_UTC(dateObj);
-
 		if (isOperatingDay(dateString)) {
 			onChangeReservationCalendarData({
 				selectedDate: dateString,
@@ -190,11 +186,9 @@ function ReservationBookingCalendar({
 	const renderCalendarDays = () => {
 		const year = viewDate.getUTCFullYear();
 		const month = viewDate.getUTCMonth();
-
 		const firstDayOfMonth =
 			(new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
 		const daysInMonth = new Date(year, month + 1, 0).getDate();
-
 		const days = [];
 
 		for (let i = 0; i < firstDayOfMonth; i++) {
@@ -208,7 +202,6 @@ function ReservationBookingCalendar({
 			const specialDayInfo = specialDaysMap.get(dateString);
 			const isOperating = isOperatingDay(dateString);
 			const isSelected = selectedDate === dateString;
-
 			let dayClasses =
 				"w-8 h-8 text-sm rounded-md transition-colors flex items-center justify-center ";
 			let title = "";
@@ -256,6 +249,12 @@ function ReservationBookingCalendar({
 		? specialDaysMap.get(selectedDate)
 		: null;
 
+	const formatDateDDMMYYYY = (dateString) => {
+		if (!dateString) return "";
+		const [year, month, day] = dateString.split("-");
+		return `${day}-${month}-${year}`;
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<main className="max-w-6xl mt-10 mx-auto p-6 bg-white m-4 rounded-lg shadow-md">
@@ -296,7 +295,6 @@ function ReservationBookingCalendar({
 								</button>
 							</div>
 						</div>
-
 						<div className="grid grid-cols-7 gap-2 mb-4 text-center">
 							{daysOfWeek.map((day) => (
 								<div
@@ -307,7 +305,6 @@ function ReservationBookingCalendar({
 								</div>
 							))}
 						</div>
-
 						<div
 							className={`transition-opacity duration-150 ${
 								isTransitioning ? "opacity-0" : "opacity-100"
@@ -317,7 +314,6 @@ function ReservationBookingCalendar({
 								{renderCalendarDays()}
 							</div>
 						</div>
-
 						<div className="mt-4 text-sm text-gray-600">
 							<div className="flex items-center space-x-4">
 								<div className="flex items-center space-x-2">
@@ -343,14 +339,12 @@ function ReservationBookingCalendar({
 								Available Time Slots
 							</h2>
 						</div>
-
 						<div className="flex-grow">
 							{selectedDate ? (
 								<div>
 									<p className="text-gray-600 mb-4 font-semibold">
 										{selectedDateDisplay}
 									</p>
-
 									{selectedSpecialDay && (
 										<div className="p-3 mb-4 bg-purple-100 border-l-4 border-purple-500 rounded-r-md">
 											<div className="flex">
@@ -368,7 +362,6 @@ function ReservationBookingCalendar({
 											</div>
 										</div>
 									)}
-
 									{timeSlots.length > 0 ? (
 										<div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-96 overflow-y-auto pr-2">
 											{timeSlots.map((slot) => (
@@ -403,7 +396,6 @@ function ReservationBookingCalendar({
 								</div>
 							)}
 						</div>
-
 						<div className="mt-6">
 							{selectedDate && (
 								<div className="p-4 bg-amber-50 rounded-md">
@@ -413,7 +405,7 @@ function ReservationBookingCalendar({
 												Your Selection
 											</p>
 											<p className="text-amber-800 text-sm">
-												{selectedDate}
+												{formatDateDDMMYYYY(selectedDate)}
 												{selectedTimeSlot
 													? ` at ${selectedTimeSlot}`
 													: " - Select a time"}

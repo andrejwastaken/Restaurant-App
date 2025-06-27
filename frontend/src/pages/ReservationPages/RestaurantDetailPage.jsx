@@ -75,7 +75,7 @@ function RestaurantDetailPage() {
         if (!response.ok) {
           throw new Error("Restaurant not found. It might have been removed.");
         }
-
+        
         const data = await response.json();
 
         setRestaurant(data);

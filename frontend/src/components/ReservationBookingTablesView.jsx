@@ -111,9 +111,8 @@ function ReservationBookingTablesView({
       y: table.y_position,
       shape: table.shape ? table.shape.toLowerCase() : "rectangle",
 
-      // NEW FLAGS FOR THIS VIEW
       isBookable: table.available, // A table is "bookable" if the API said it's available
-      isSelected: table.id === selectedTableId, // The currently selected one
+      isSelected: table.id === selectedTableId, 
     }));
   }, [currentRestaurantTables, selectedTableId]);
 

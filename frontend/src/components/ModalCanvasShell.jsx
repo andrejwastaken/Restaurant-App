@@ -26,7 +26,7 @@ function ModalCanvasShell({ children, onClose, label, width }) {
   return (
     // Backdrop overlay
     <div
-      className={`z-[9999] fixed inset-0 bg-black flex justify-center items-center z-50 p-4 transition-opacity duration-300 ease-out ${
+      className={`z-[9999] fixed inset-0 bg-black flex justify-center items-center p-4 transition-opacity duration-300 ease-out ${
         isShowing ? "bg-opacity-60" : "bg-opacity-0"
       }`}
       onClick={handleClose}

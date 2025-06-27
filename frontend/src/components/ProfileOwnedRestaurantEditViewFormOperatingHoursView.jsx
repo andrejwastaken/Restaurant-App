@@ -1,7 +1,5 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useProfileData } from "../contexts/ProfileDataContext";
-
-import ProfileMenuContentTitle from "./ProfileMenuContentTitle";
 import RestaurantFormOperatingHoursViewContent from "./RestaurantFormOperatingHoursViewContent";
 
 function ProfileOwnedRestaurantEditViewFormOperatingHoursView({
@@ -37,7 +35,7 @@ function ProfileOwnedRestaurantEditViewFormOperatingHoursView({
     savePending.current = true;
     handleCurrentOwnedRestaurant(newRestaurantOperatingHours);
     onSave(newRestaurantOperatingHours);
-    onReturn(); // this can stay here
+    onReturn(); 
   };
 
   return (
